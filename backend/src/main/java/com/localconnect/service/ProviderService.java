@@ -60,12 +60,14 @@ public class ProviderService {
         return mapToDto(saved);
     }
 
+    @Transactional(readOnly = true)
     public ProviderProfileDto getProfileByUserId(Long userId) {
         Provider provider = providerRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found"));
         return mapToDto(provider);
     }
 
+    @Transactional(readOnly = true)
     public ProviderProfileDto getProfileById(Long id) {
         Provider provider = providerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider not found"));
@@ -116,6 +118,7 @@ public class ProviderService {
         return mapDriverToDto(saved);
     }
 
+    @Transactional(readOnly = true)
     public List<ResourceDto> getProviderResources(Long userId) {
         Provider provider = providerRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider not found"));
@@ -124,6 +127,7 @@ public class ProviderService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<DriverDto> getProviderDrivers(Long userId) {
         Provider provider = providerRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider not found"));
@@ -132,6 +136,7 @@ public class ProviderService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ResourceDto> searchActiveResources(ResourceCategory category, String subType) {
         List<Resource> resources;
         if (subType != null && !subType.isBlank()) {

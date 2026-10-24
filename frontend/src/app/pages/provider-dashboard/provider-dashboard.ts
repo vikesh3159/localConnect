@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { MockDataService } from '../../services/mock-data.service';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { RequestStateService } from '../../services/request-state.service';
 import { BroadcastPolicyService } from '../../services/broadcast-policy.service';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge';
 import { Driver, ProviderResource } from '../../models/provider.model';
@@ -20,6 +21,7 @@ export class ProviderDashboardComponent implements OnInit {
   private readonly mockData = inject(MockDataService);
   private readonly api = inject(ApiService);
   readonly auth = inject(AuthService);
+  private readonly requestState = inject(RequestStateService);
   readonly broadcastPolicy = inject(BroadcastPolicyService);
   private readonly router = inject(Router);
 
@@ -117,8 +119,17 @@ export class ProviderDashboardComponent implements OnInit {
       },
     });
 
-    // 3. Load incoming requests
-    this.incomingRequests.set([
+    // 3. Load incoming requests (Customer-created requests + broadcasted defaults)
+    const storedRequests: UserRequest[] = this.requestState.requests()
+      .filter((r) => r.status !== 'cancelled')
+      .map((r) => ({
+        ...r,
+        status: (r.status === 'submitted' ? 'broadcasted' : r.status) as RequestStatus,
+        broadcastExpiresAt: r.broadcastExpiresAt || new Date(Date.now() + 4 * 3600000).toISOString(),
+        quantityRequired: r.quantityRequired || 1,
+      }));
+
+    const defaultRequests: UserRequest[] = [
       {
         id: 'REQ-VEH-101',
         referenceNumber: 'LC-VEH-9014',
@@ -155,7 +166,9 @@ export class ProviderDashboardComponent implements OnInit {
         broadcastExpiresAt: new Date(Date.now() + 3.16 * 3600000).toISOString(),
         quantityRequired: 1,
       },
-    ]);
+    ];
+
+    this.incomingRequests.set([...storedRequests, ...defaultRequests]);
 
     // 4. Initial demo offers
     this.providerOffers.set([

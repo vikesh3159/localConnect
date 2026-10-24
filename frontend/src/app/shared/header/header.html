@@ -29,6 +29,11 @@
       <a routerLink="/provider-dashboard" class="nav-link" (click)="closeMobileMenu()">
         {{ 'NAV.PROVIDER_DASHBOARD' | translate }}
       </a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/admin" class="nav-link nav-admin" (click)="closeMobileMenu()">
+          🛡️ Admin
+        </a>
+      }
 
       @if (auth.isLoggedIn()) {
         <div class="user-controls">

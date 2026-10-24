@@ -65,7 +65,7 @@
 
   .personas-buttons {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 0.5rem;
   }
 
@@ -94,6 +94,19 @@
     &:hover {
       border-color: var(--lc-primary);
       background: #f0fdf4;
+    }
+
+    &.admin {
+      border-color: #cbd5e1;
+
+      strong {
+        color: #7c3aed;
+      }
+
+      &:hover {
+        border-color: #7c3aed;
+        background: #f5f3ff;
+      }
     }
   }
 }

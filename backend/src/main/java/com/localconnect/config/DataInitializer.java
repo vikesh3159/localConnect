@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Component
-@Profile("dev")
+@Profile({"dev", "mysql"})
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;

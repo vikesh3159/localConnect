@@ -34,8 +34,8 @@ export class LoginComponent {
 
   onSubmitLogin(): void {
     const phone = this.loginPhone().trim();
-    if (!phone || phone.length < 10) {
-      this.errorMessage.set('Please enter a valid 10-digit mobile number.');
+    if (!phone || (phone.length < 10 && phone.toLowerCase() !== 'admin')) {
+      this.errorMessage.set('Please enter a valid 10-digit mobile number or "admin".');
       return;
     }
     this.isSubmitting.set(true);
@@ -45,6 +45,9 @@ export class LoginComponent {
       next: (user) => {
         this.isSubmitting.set(false);
         this.isSuccess.set(true);
+        if (user.roles?.includes('ADMIN') || user.currentRole === 'ADMIN') {
+          this.router.navigate(['/admin']);
+        }
       },
       error: (err) => {
         this.isSubmitting.set(false);
@@ -87,25 +90,30 @@ export class LoginComponent {
     });
   }
 
-  quickLogin(phone: string, role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN', name: string): void {
+  quickLogin(phone: string, role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN', name: string, otp: string = '123456'): void {
     this.isSubmitting.set(true);
     this.errorMessage.set('');
 
-    this.auth.login(phone, '123456', name).subscribe({
+    this.auth.login(phone, otp, name).subscribe({
       next: (user) => {
-        if (role === 'PROVIDER') {
+        this.isSubmitting.set(false);
+        if (role === 'ADMIN' || user.roles?.includes('ADMIN')) {
+          this.router.navigate(['/admin']);
+        } else if (role === 'PROVIDER') {
           this.auth.switchRole('PROVIDER').subscribe(() => {
-            this.isSubmitting.set(false);
             this.router.navigate(['/provider-dashboard']);
           });
         } else {
-          this.isSubmitting.set(false);
           this.router.navigate(['/my-requests']);
         }
       },
       error: () => {
         this.isSubmitting.set(false);
-        this.router.navigate(['/my-requests']);
+        if (role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/my-requests']);
+        }
       },
     });
   }

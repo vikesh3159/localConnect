@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Pattern;
 
 public class AuthRequest {
 
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Please provide a valid 10-digit Indian mobile number")
+    @NotBlank(message = "Phone number or username is required")
+    @Pattern(regexp = "^([6-9]\\d{9}|admin)$", message = "Please provide a valid 10-digit Indian mobile number or 'admin'")
     private String phone;
 
     private String fullName;

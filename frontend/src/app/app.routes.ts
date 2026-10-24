@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -67,6 +68,16 @@ export const routes: Routes = [
   {
     path: 'provider-dashboard',
     loadComponent: () => import('./pages/provider-dashboard/provider-dashboard').then((m) => m.ProviderDashboardComponent),
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./pages/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboardComponent),
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin-dashboard',
+    redirectTo: 'admin',
+    pathMatch: 'full',
   },
   {
     path: 'resource-management',

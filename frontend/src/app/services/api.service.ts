@@ -150,7 +150,7 @@ export class ApiService {
     return this.http.post<{ message: string }>(`${this.baseUrl}/provider/documents`, docPayload);
   }
 
-  // 7. Administrator Review Queue
+  // 7. Administrator Management & Review
   getPendingDocuments(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/admin/documents/pending`);
   }
@@ -160,6 +160,18 @@ export class ApiService {
       approved,
       rejectionReason,
     });
+  }
+
+  getAdminProviders(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/admin/providers`);
+  }
+
+  getAdminCustomers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/admin/customers`);
+  }
+
+  verifyProvider(providerId: number, status: string = 'APPROVED'): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/admin/providers/${providerId}/verify`, { status });
   }
 }
 

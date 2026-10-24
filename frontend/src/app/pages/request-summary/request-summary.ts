@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SearchStateService } from '../../services/search-state.service';
 import { RequestStateService } from '../../services/request-state.service';
+import { ApiService } from '../../services/api.service';
 import { RequestCategory } from '../../models/types';
 
 @Component({
@@ -14,6 +15,7 @@ import { RequestCategory } from '../../models/types';
 export class RequestSummaryComponent {
   private searchState = inject(SearchStateService);
   private requestState = inject(RequestStateService);
+  private api = inject(ApiService);
   private router = inject(Router);
 
   category = this.searchState.selectedCategory;
@@ -97,6 +99,29 @@ export class RequestSummaryComponent {
       this.providerName(),
       this.resourceName()
     );
+
+    // Also attempt backend creation if connected
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const payload = {
+        category: cat.toUpperCase(),
+        urgencyLevel: 'NORMAL',
+        quantityRequired: 1,
+        pickupLocation: summaryRecord['REQUEST_SUMMARY.PICKUP'] || summaryRecord['REQUEST_SUMMARY.LOCATION'] || 'Local Pickup',
+        destinationLocation: summaryRecord['REQUEST_SUMMARY.DESTINATION'] || 'Local Destination',
+        scheduledDate: today,
+        scheduledTime: '10:00:00',
+        stayType: summaryRecord['REQUEST_SUMMARY.ROOM_TYPE'],
+        goodsType: summaryRecord['REQUEST_SUMMARY.GOODS_TYPE'],
+        specialInstructions: `Booking for ${this.resourceName()} via ${this.providerName()}`
+      };
+      this.api.createRequest(payload).subscribe({
+        next: (res) => console.log('Backend request created successfully', res),
+        error: (err) => console.warn('Backend request sync deferred, stored locally:', err)
+      });
+    } catch (e) {
+      console.warn('API sync caught exception', e);
+    }
 
     this.router.navigate(['/request-confirmation', request.referenceNumber]);
   }

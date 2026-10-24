@@ -1,0 +1,297 @@
+<div class="admin-page">
+  <div class="admin-container">
+    
+    <!-- Top Hero Banner -->
+    <header class="admin-header">
+      <div class="admin-header__title-block">
+        <span class="admin-badge">🛡️ RESTRICTED ACCESS — ADMIN ONLY</span>
+        <h1 class="admin-title">Administrator Operations Portal</h1>
+        <p class="admin-subtitle">
+          Manage local service providers, customer directory, and regulatory compliance documents across Madhya Pradesh & Maharashtra regions.
+        </p>
+      </div>
+
+      <div class="admin-header__actions">
+        <button type="button" class="btn-refresh" (click)="loadAdminData()" [disabled]="loading()">
+          🔄 {{ loading() ? 'Refreshing...' : 'Refresh Data' }}
+        </button>
+      </div>
+    </header>
+
+    @if (successMessage()) {
+      <div class="alert-success" role="alert">
+        <span>✅ {{ successMessage() }}</span>
+      </div>
+    }
+
+    <!-- Stat Metric Cards -->
+    <section class="stats-grid" aria-label="Platform Statistics">
+      <div class="stat-card">
+        <div class="stat-icon providers-icon">🏢</div>
+        <div class="stat-content">
+          <span class="stat-label">Total Providers</span>
+          <strong class="stat-value">{{ totalProvidersCount() }}</strong>
+          <small class="stat-hint">{{ approvedProvidersCount() }} currently verified & active</small>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon customers-icon">👥</div>
+        <div class="stat-content">
+          <span class="stat-label">Total Customers</span>
+          <strong class="stat-value">{{ totalCustomersCount() }}</strong>
+          <small class="stat-hint">Registered mobile marketplace users</small>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon docs-icon">📄</div>
+        <div class="stat-content">
+          <span class="stat-label">Pending Reviews</span>
+          <strong class="stat-value warning">{{ pendingDocsCount() }}</strong>
+          <small class="stat-hint">RC and commercial licence uploads</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs & Search Bar -->
+    <div class="controls-bar">
+      <nav class="admin-tabs" role="tablist">
+        <button
+          type="button"
+          class="tab-item"
+          [class.active]="activeTab() === 'providers'"
+          (click)="setTab('providers')"
+          role="tab"
+        >
+          🏢 Providers ({{ providers().length }})
+        </button>
+        <button
+          type="button"
+          class="tab-item"
+          [class.active]="activeTab() === 'customers'"
+          (click)="setTab('customers')"
+          role="tab"
+        >
+          👥 Customers ({{ customers().length }})
+        </button>
+        <button
+          type="button"
+          class="tab-item"
+          [class.active]="activeTab() === 'documents'"
+          (click)="setTab('documents')"
+          role="tab"
+        >
+          📄 Pending Documents
+          @if (pendingDocsCount() > 0) {
+            <span class="tab-badge">{{ pendingDocsCount() }}</span>
+          }
+        </button>
+      </nav>
+
+      <div class="search-box">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="text"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Filter by name, phone or district..."
+          aria-label="Filter records"
+        />
+        @if (searchQuery()) {
+          <button type="button" class="btn-clear" (click)="searchQuery.set('')">✕</button>
+        }
+      </div>
+    </div>
+
+    <!-- TAB 1: PROVIDERS DIRECTORY -->
+    @if (activeTab() === 'providers') {
+      <div class="tab-content">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Business & Owner</th>
+                <th>Contact</th>
+                <th>District / Base</th>
+                <th>Rating & Jobs</th>
+                <th>Status</th>
+                <th>Administrative Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of filteredProviders(); track p.id) {
+                <tr>
+                  <td class="cell-id">#{{ p.id }}</td>
+                  <td>
+                    <strong>{{ p.businessName }}</strong>
+                    <div class="cell-sub">Owner: {{ p.ownerName }}</div>
+                  </td>
+                  <td>
+                    <a href="tel:{{ p.phone }}" class="phone-link">📱 {{ p.phone }}</a>
+                  </td>
+                  <td>
+                    <div>{{ p.operationalDistrict }}, {{ p.operationalTaluka }}</div>
+                    <small class="cell-sub">Base: {{ p.serviceBase }}</small>
+                  </td>
+                  <td>
+                    <div class="rating-badge">⭐ {{ p.ratingAverage || '0.0' }}</div>
+                    <small class="cell-sub">{{ p.totalCompletedJobs }} jobs completed</small>
+                  </td>
+                  <td>
+                    @if (p.verificationStatus === 'APPROVED') {
+                      <span class="badge badge-success">VERIFIED</span>
+                    } @else if (p.verificationStatus === 'PENDING_APPROVAL') {
+                      <span class="badge badge-warning">PENDING</span>
+                    } @else {
+                      <span class="badge badge-danger">{{ p.verificationStatus }}</span>
+                    }
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      @if (p.verificationStatus !== 'APPROVED') {
+                        <button type="button" class="btn-action approve" (click)="verifyProvider(p.id, 'APPROVED')">
+                          ✓ Approve
+                        </button>
+                      }
+                      @if (p.verificationStatus === 'APPROVED') {
+                        <button type="button" class="btn-action suspend" (click)="verifyProvider(p.id, 'SUSPENDED')">
+                          ✕ Suspend
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7" class="empty-cell">
+                    No providers found matching your search criteria.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 2: CUSTOMERS DIRECTORY -->
+    @if (activeTab() === 'customers') {
+      <div class="tab-content">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Customer Name</th>
+                <th>Mobile Number</th>
+                <th>Active Role</th>
+                <th>Assigned Roles</th>
+                <th>Status</th>
+                <th>Language</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of filteredCustomers(); track c.id) {
+                <tr>
+                  <td class="cell-id">#{{ c.id }}</td>
+                  <td>
+                    <strong>{{ c.fullName }}</strong>
+                  </td>
+                  <td>
+                    <a href="tel:{{ c.phone }}" class="phone-link">📱 {{ c.phone }}</a>
+                  </td>
+                  <td>
+                    <span class="role-pill">{{ c.activeRole }}</span>
+                  </td>
+                  <td>
+                    <div class="roles-tags">
+                      @for (r of c.roles; track r) {
+                        <span class="tag">{{ r }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    @if (c.isActive) {
+                      <span class="badge badge-success">ACTIVE</span>
+                    } @else {
+                      <span class="badge badge-danger">INACTIVE</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="lang-tag">{{ c.preferredLanguage || 'en' | uppercase }}</span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7" class="empty-cell">
+                    No customers found matching your search criteria.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 3: PENDING COMPLIANCE DOCUMENTS -->
+    @if (activeTab() === 'documents') {
+      <div class="tab-content">
+        @if (pendingDocuments().length === 0) {
+          <div class="empty-box">
+            <span class="empty-icon">✅</span>
+            <h3>Compliance Review Queue is Clear</h3>
+            <p>All provider registration certificates (RC) and commercial driving licences have been verified.</p>
+          </div>
+        } @else {
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Doc ID</th>
+                  <th>Provider ID</th>
+                  <th>Document Type</th>
+                  <th>Attached File</th>
+                  <th>Compliance Status</th>
+                  <th>Verification Review</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (doc of pendingDocuments(); track doc.id) {
+                  <tr>
+                    <td class="cell-id">#{{ doc.id }}</td>
+                    <td>
+                      <strong>Provider #{{ doc.providerId }}</strong>
+                    </td>
+                    <td>
+                      <span class="doc-type-badge">{{ doc.documentType }}</span>
+                    </td>
+                    <td>
+                      <span class="file-link">📎 {{ doc.fileName }}</span>
+                    </td>
+                    <td>
+                      <span class="badge badge-warning">Awaiting Approval</span>
+                    </td>
+                    <td>
+                      <div class="action-buttons">
+                        <button type="button" class="btn-action approve" (click)="reviewDoc(doc.id, true)">
+                          ✓ Approve Document
+                        </button>
+                        <button type="button" class="btn-action reject" (click)="reviewDoc(doc.id, false)">
+                          ✕ Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>

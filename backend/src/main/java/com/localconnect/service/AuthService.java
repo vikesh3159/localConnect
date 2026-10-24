@@ -53,6 +53,22 @@ public class AuthService {
 
     @Transactional
     public AuthResponse loginOrRegister(AuthRequest request) {
+        // Direct Administrator Login (Credentials: admin / admin)
+        if ("admin".equalsIgnoreCase(request.getPhone())) {
+            if (!"admin".equals(request.getOtp())) {
+                throw new InvalidStateException("Invalid password for admin. Please enter 'admin'.");
+            }
+            User admin = userRepository.findByPhone("admin")
+                    .orElseGet(() -> {
+                        User newAdmin = new User("admin", "System Administrator", passwordEncoder.encode("admin"), RoleType.ADMIN);
+                        newAdmin.setRoles(Set.of(RoleType.ADMIN, RoleType.CUSTOMER));
+                        return userRepository.save(newAdmin);
+                    });
+            auditService.logEvent(admin.getId(), "ADMIN", admin.getId().toString(), "ADMIN_LOGIN", null, "ACTIVE",
+                    "Administrator logged in directly");
+            return generateAuthResponse(admin);
+        }
+
         // Validate OTP (standard simulated OTP check)
         if (request.getOtp() != null && !request.getOtp().equals("123456") && !request.getOtp().equals("000000")) {
             throw new InvalidStateException("Invalid OTP entered. Please try again.");

@@ -18,6 +18,10 @@
           🚗 <strong>Provider</strong>
           <small>Rajesh Kumar</small>
         </button>
+        <button type="button" class="persona-btn admin" (click)="quickLogin('admin', 'ADMIN', 'System Administrator', 'admin')">
+          🛡️ <strong>Admin</strong>
+          <small>admin / admin</small>
+        </button>
       </div>
     </div>
 
@@ -72,18 +76,18 @@
               <span class="input-icon" aria-hidden="true">📱</span>
               <input
                 id="l-phone"
-                type="tel"
+                type="text"
                 required
                 [ngModel]="loginPhone()"
                 (ngModelChange)="loginPhone.set($event)"
                 name="phone"
-                [attr.placeholder]="'LOGIN.PHONE_PLACEHOLDER' | translate"
+                placeholder="10-digit mobile number or 'admin'"
               />
             </div>
           </div>
 
           <div class="form-group">
-            <label for="l-otp">One-Time Password (OTP)</label>
+            <label for="l-otp">One-Time Password (OTP) / Password</label>
             <div class="input-with-icon">
               <span class="input-icon" aria-hidden="true">🔑</span>
               <input
@@ -93,10 +97,10 @@
                 [ngModel]="loginOtp()"
                 (ngModelChange)="loginOtp.set($event)"
                 name="otp"
-                placeholder="Default: 123456"
+                placeholder="OTP 123456 or 'admin'"
               />
             </div>
-            <small class="helper-text">Simulated SMS OTP: Use <strong>123456</strong> for testing.</small>
+            <small class="helper-text">Simulated SMS OTP: Use <strong>123456</strong> (or enter <strong>admin</strong> for Administrator).</small>
           </div>
 
           <button type="submit" class="btn-primary auth-submit" [disabled]="isSubmitting()">
