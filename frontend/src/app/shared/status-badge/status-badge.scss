@@ -1,0 +1,57 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  background: #edf2f7;
+  color: #4a5568;
+
+  &--submitted {
+    background: #e6fffa;
+    color: #047481;
+    border: 1px solid #b2f5ea;
+  }
+
+  &--awaiting-response {
+    background: #fffaf0;
+    color: #c05621;
+    border: 1px solid #feebc8;
+  }
+
+  &--accepted {
+    background: #f0fff4;
+    color: #22543d;
+    border: 1px solid #c6f6d5;
+  }
+
+  &--rejected {
+    background: #fff5f5;
+    color: #9b2c2c;
+    border: 1px solid #fed7d7;
+  }
+
+  &--cancelled {
+    background: #f7fafc;
+    color: #718096;
+    border: 1px solid #e2e8f0;
+  }
+
+  &--completed {
+    background: #ebf8ff;
+    color: #2b6cb0;
+    border: 1px solid #bee3f8;
+  }
+
+  &--draft {
+    background: #edf2f7;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+  }
+}
+

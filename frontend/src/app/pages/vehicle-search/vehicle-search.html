@@ -1,0 +1,174 @@
+<div class="search-page">
+  <div class="search-container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/">{{ 'NAV.HOME' | translate }}</a>
+      <span class="sep" aria-hidden="true">&rsaquo;</span>
+      <span class="current">{{ 'VEHICLE_SEARCH.BREADCRUMB' | translate }}</span>
+    </nav>
+
+    <div class="page-heading">
+      <div class="heading-badge vehicle-badge">
+        <span aria-hidden="true">🚗</span>
+        <span>{{ 'VEHICLE_SEARCH.CATEGORY_LABEL' | translate }}</span>
+      </div>
+      <h1>{{ 'VEHICLE_SEARCH.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'VEHICLE_SEARCH.WITH_DRIVER_NOTE' | translate }}</p>
+    </div>
+
+    <form class="search-card" (submit)="$event.preventDefault(); searchVehicles()">
+      <!-- Pickup Location -->
+      <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['pickup']">
+        <label for="pickup-input">
+          <span>{{ 'VEHICLE_SEARCH.PICKUP_LOCATION' | translate }}</span>
+          <span class="required" aria-hidden="true">*</span>
+        </label>
+        <div class="input-with-icon">
+          <span class="input-icon" aria-hidden="true">📍</span>
+          <input
+            id="pickup-input"
+            type="text"
+            [value]="searchForm().pickup"
+            (input)="updateField('pickup', $any($event.target).value)"
+            [attr.placeholder]="'VEHICLE_SEARCH.PICKUP_PLACEHOLDER' | translate"
+            autocomplete="off"
+          />
+        </div>
+        @if (isSubmitted() && formErrors()['pickup']) {
+          <p class="error-msg">{{ formErrors()['pickup'] | translate }}</p>
+        }
+      </div>
+
+      <!-- Destination -->
+      <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['destination']">
+        <label for="destination-input">
+          <span>{{ 'VEHICLE_SEARCH.DESTINATION' | translate }}</span>
+          <span class="required" aria-hidden="true">*</span>
+        </label>
+        <div class="input-with-icon">
+          <span class="input-icon" aria-hidden="true">🎯</span>
+          <input
+            id="destination-input"
+            type="text"
+            [value]="searchForm().destination"
+            (input)="updateField('destination', $any($event.target).value)"
+            [attr.placeholder]="'VEHICLE_SEARCH.DESTINATION_PLACEHOLDER' | translate"
+            autocomplete="off"
+          />
+        </div>
+        @if (isSubmitted() && formErrors()['destination']) {
+          <p class="error-msg">{{ formErrors()['destination'] | translate }}</p>
+        }
+      </div>
+
+      <!-- Date & Time 2-Column Row -->
+      <div class="form-row">
+        <!-- Date -->
+        <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['date']">
+          <label for="date-input">
+            <span>{{ 'VEHICLE_SEARCH.DATE' | translate }}</span>
+            <span class="required" aria-hidden="true">*</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon" aria-hidden="true">📅</span>
+            <input
+              id="date-input"
+              type="date"
+              [min]="todayDate"
+              [value]="searchForm().date"
+              (input)="updateField('date', $any($event.target).value)"
+            />
+          </div>
+          @if (isSubmitted() && formErrors()['date']) {
+            <p class="error-msg">{{ formErrors()['date'] | translate }}</p>
+          }
+        </div>
+
+        <!-- Time -->
+        <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['time']">
+          <label for="time-input">
+            <span>{{ 'VEHICLE_SEARCH.TIME' | translate }}</span>
+            <span class="required" aria-hidden="true">*</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon" aria-hidden="true">⏰</span>
+            <input
+              id="time-input"
+              type="time"
+              [value]="searchForm().time"
+              (input)="updateField('time', $any($event.target).value)"
+            />
+          </div>
+          @if (isSubmitted() && formErrors()['time']) {
+            <p class="error-msg">{{ formErrors()['time'] | translate }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Vehicles Required Counter & Vehicle Type -->
+      <div class="form-row">
+        <!-- Counter -->
+        <div class="form-group">
+          <label>
+            <span>{{ 'VEHICLE_SEARCH.VEHICLES_REQUIRED' | translate }}</span>
+          </label>
+          <div class="counter-control" role="group" [attr.aria-label]="'VEHICLE_SEARCH.VEHICLES_REQUIRED' | translate">
+            <button
+              type="button"
+              class="counter-btn"
+              [disabled]="searchForm().vehiclesRequired <= 1"
+              (click)="changeVehiclesRequired(-1)"
+              [attr.aria-label]="'VEHICLE_SEARCH.DECREASE_VEHICLES' | translate"
+            >&minus;</button>
+            <span class="counter-value">{{ searchForm().vehiclesRequired }}</span>
+            <button
+              type="button"
+              class="counter-btn"
+              (click)="changeVehiclesRequired(1)"
+              [attr.aria-label]="'VEHICLE_SEARCH.INCREASE_VEHICLES' | translate"
+            >&plus;</button>
+          </div>
+        </div>
+
+        <!-- Vehicle Type -->
+        <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['vehicleType']">
+          <label for="type-select">
+            <span>{{ 'VEHICLE_SEARCH.VEHICLE_TYPE' | translate }}</span>
+            <span class="required" aria-hidden="true">*</span>
+          </label>
+          <div class="select-wrapper">
+            <select
+              id="type-select"
+              [value]="searchForm().vehicleType"
+              (change)="updateField('vehicleType', $any($event.target).value)"
+            >
+              <option value="">{{ 'VEHICLE_SEARCH.SELECT_TYPE' | translate }}</option>
+              @for (type of vehicleTypes; track type.value) {
+                <option [value]="type.value">{{ type.labelKey | translate }}</option>
+              }
+            </select>
+          </div>
+          @if (isSubmitted() && formErrors()['vehicleType']) {
+            <p class="error-msg">{{ formErrors()['vehicleType'] | translate }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Business Rule Note -->
+      <div class="info-callout">
+        <span class="info-icon" aria-hidden="true">💡</span>
+        <p class="info-text">{{ 'VEHICLE_SEARCH.ROUTE_NOTE' | translate }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary search-submit-btn">
+          {{ 'VEHICLE_SEARCH.SEARCH_AVAILABLE' | translate }} &rarr;
+        </button>
+        <button type="button" class="btn-secondary" (click)="resetForm()">
+          {{ 'COMMON.RESET' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

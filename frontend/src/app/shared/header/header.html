@@ -1,0 +1,78 @@
+<header class="header">
+  <div class="header-inner">
+    <a class="header-brand" routerLink="/" (click)="closeMobileMenu()" [attr.aria-label]="'APP.NAME' | translate">
+      <span class="header-logo" aria-hidden="true"></span>
+      <span class="header-name">{{ 'APP.NAME' | translate }}</span>
+    </a>
+
+    <button
+      class="header-hamburger"
+      type="button"
+      [attr.aria-label]="'NAV.MENU' | translate"
+      [attr.aria-expanded]="mobileMenuOpen()"
+      (click)="toggleMobileMenu()"
+    >
+      @if (mobileMenuOpen()) {
+        <span aria-hidden="true">✕</span>
+      } @else {
+        <span aria-hidden="true">☰</span>
+      }
+    </button>
+
+    <nav class="header-nav" [class.open]="mobileMenuOpen()">
+      <a routerLink="/emergency" class="nav-link nav-emergency" (click)="closeMobileMenu()">
+        🚨 {{ 'CATEGORY.EMERGENCY' | translate }}
+      </a>
+      <a routerLink="/my-requests" class="nav-link" (click)="closeMobileMenu()">
+        {{ 'NAV.MY_REQUESTS' | translate }}
+      </a>
+      <a routerLink="/provider-dashboard" class="nav-link" (click)="closeMobileMenu()">
+        {{ 'NAV.PROVIDER_DASHBOARD' | translate }}
+      </a>
+
+      @if (auth.isLoggedIn()) {
+        <div class="user-controls">
+          <button
+            type="button"
+            class="role-toggle-btn"
+            [class.provider]="auth.isProviderMode()"
+            (click)="toggleRoleMode()"
+            [attr.title]="auth.isProviderMode() ? 'Switch to Customer Mode' : 'Switch to Provider Mode'"
+          >
+            <span class="role-icon">{{ auth.isProviderMode() ? '🚗' : '👤' }}</span>
+            <span class="role-text">{{ auth.isProviderMode() ? 'Provider Mode' : 'Customer Mode' }}</span>
+            <span class="role-switch-hint">⇄</span>
+          </button>
+
+          <span class="user-greeting" [attr.title]="auth.currentUser()?.phone">
+            {{ auth.currentUser()?.fullName }}
+          </span>
+
+          <button type="button" class="btn-logout" (click)="logout()" title="Sign Out">
+            🚪
+          </button>
+        </div>
+      } @else {
+        <a routerLink="/login" class="nav-link nav-login" (click)="closeMobileMenu()">
+          {{ 'NAV.LOGIN' | translate }}
+        </a>
+      }
+
+      <div class="lang-switch" [attr.aria-label]="'COMMON.LANGUAGE' | translate">
+        <button
+          type="button"
+          [class.active]="currentLanguage() === 'en'"
+          [attr.aria-pressed]="currentLanguage() === 'en'"
+          (click)="changeLanguage('en')"
+        >{{ 'COMMON.ENGLISH' | translate }}</button>
+        <span class="lang-divider" aria-hidden="true">|</span>
+        <button
+          type="button"
+          [class.active]="currentLanguage() === 'hi'"
+          [attr.aria-pressed]="currentLanguage() === 'hi'"
+          (click)="changeLanguage('hi')"
+        >{{ 'COMMON.HINDI' | translate }}</button>
+      </div>
+    </nav>
+  </div>
+</header>

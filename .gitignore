@@ -1,0 +1,20 @@
+
+# Java / Maven
+backend/target/
+*.class
+
+# Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

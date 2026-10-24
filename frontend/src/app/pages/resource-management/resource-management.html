@@ -1,0 +1,479 @@
+<div class="management-page">
+  <div class="management-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/">{{ 'NAV.HOME' | translate }}</a>
+      <span class="sep" aria-hidden="true">&rsaquo;</span>
+      <a routerLink="/provider-dashboard">{{ 'NAV.PROVIDER_DASHBOARD' | translate }}</a>
+      <span class="sep" aria-hidden="true">&rsaquo;</span>
+      <span class="current">{{ 'RESOURCE_MGMT.TITLE' | translate }}</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="mgmt-header">
+      <div>
+        <h1>{{ 'RESOURCE_MGMT.TITLE' | translate }}</h1>
+        <p class="subtitle">{{ 'RESOURCE_MGMT.SUBTITLE' | translate }}</p>
+      </div>
+
+      <div class="mgmt-actions">
+        <button type="button" class="btn-primary" (click)="openAddResourceModal()">
+          <span aria-hidden="true">➕</span>
+          <span>{{ 'RESOURCE_MGMT.ADD_RESOURCE' | translate }}</span>
+        </button>
+        <button type="button" class="btn-secondary" (click)="openAddDriverModal()">
+          <span aria-hidden="true">👤</span>
+          <span>Register Certified Driver</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Verification & Compliance Notice -->
+    <div class="compliance-banner">
+      <span class="banner-icon" aria-hidden="true">🛡️</span>
+      <div class="banner-content">
+        <strong>Mandatory Verification & Compliance Policy:</strong>
+        <p>All vehicles and drivers must be backed by government-issued Registration Certificates (RC) and commercial Driving Licenses (DL). New submissions enter the <strong>Pending Admin Review</strong> queue before becoming publicly visible in search results.</p>
+      </div>
+    </div>
+
+    <!-- Management Tabs -->
+    <div class="mgmt-tabs">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'resources'"
+        (click)="activeTab.set('resources')"
+      >
+        📦 Listed Resources ({{ resources().length }})
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'drivers'"
+        (click)="activeTab.set('drivers')"
+      >
+        👤 Fleet Drivers ({{ drivers().length }})
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'documents'"
+        (click)="activeTab.set('documents')"
+      >
+        📄 Compliance & Document Uploads
+      </button>
+    </div>
+
+    <!-- Tab 1: Listed Resources -->
+    @if (activeTab() === 'resources') {
+      <div class="resource-list">
+        @for (resource of resources(); track resource.id) {
+          <article class="resource-item" [class.inactive]="!resource.isActive">
+            <div class="item-visual">
+              <span class="item-icon" aria-hidden="true">{{ getCategoryIcon(resource.category) }}</span>
+            </div>
+
+            <div class="item-main">
+              <div class="item-header">
+                <div>
+                  <span class="item-category-tag">{{ 'CATEGORY.' + resource.category.toUpperCase() | translate }}</span>
+                  <h2 class="item-name">{{ resource.name }}</h2>
+                  <span class="item-type">{{ resource.type }}</span>
+                </div>
+
+                <div class="item-badges">
+                  <!-- Verification status badge -->
+                  @if (resource.approvalStatus === 'APPROVED' || !resource.approvalStatus) {
+                    <span class="verify-badge approved">✓ Verified & Live</span>
+                  } @else if (resource.approvalStatus === 'PENDING_APPROVAL') {
+                    <span class="verify-badge pending">⏳ Pending Admin Review</span>
+                  } @else {
+                    <span class="verify-badge rejected">✕ Needs Document Update</span>
+                  }
+
+                  <div class="item-status-toggle">
+                    <label class="switch" [attr.aria-label]="'RESOURCE_MGMT.TOGGLE_LISTING' | translate">
+                      <input
+                        type="checkbox"
+                        [checked]="resource.isActive"
+                        (change)="toggleStatus(resource.id)"
+                      />
+                      <span class="slider round"></span>
+                    </label>
+                    <span class="status-label" [class.active]="resource.isActive">
+                      {{ (resource.isActive ? 'RESOURCE_MGMT.ACTIVE' : 'RESOURCE_MGMT.INACTIVE') | translate }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <p class="item-desc">{{ resource.description }}</p>
+
+              <div class="item-specs-row">
+                <div class="spec-cell">
+                  <span class="label">{{ 'RESOURCE_MGMT.PRICING' | translate }}:</span>
+                  <strong>{{ resource.pricing }}</strong>
+                  <span class="sub">({{ resource.pricingBasis }})</span>
+                </div>
+                <div class="spec-cell">
+                  <span class="label">{{ 'RESOURCE_MGMT.CAPACITY' | translate }}:</span>
+                  <strong>{{ resource.capacity }}</strong>
+                </div>
+                <div class="spec-cell">
+                  <span class="label">{{ 'RESOURCE_MGMT.SERVICE_AREA' | translate }}:</span>
+                  <strong>{{ resource.serviceArea }}</strong>
+                </div>
+              </div>
+
+              <div class="item-actions">
+                <button
+                  type="button"
+                  class="btn-upload-rc"
+                  (click)="openUploadModal('RC', 'resource', resource.id)"
+                >
+                  📄 Upload Vehicle RC
+                </button>
+                <button
+                  type="button"
+                  class="btn-delete"
+                  (click)="deleteResource(resource.id)"
+                  [attr.aria-label]="'RESOURCE_MGMT.REMOVE' | translate"
+                >
+                  <span aria-hidden="true">🗑️</span>
+                  <span>{{ 'RESOURCE_MGMT.REMOVE' | translate }}</span>
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    <!-- Tab 2: Registered Fleet Drivers -->
+    @if (activeTab() === 'drivers') {
+      <div class="drivers-grid">
+        @for (driver of drivers(); track driver.id) {
+          <div class="driver-card">
+            <div class="driver-card-top">
+              <div class="driver-avatar">👤</div>
+              <div class="driver-info">
+                <h3>{{ driver.fullName }}</h3>
+                <span class="driver-phone">{{ driver.phone }}</span>
+              </div>
+              <span class="verify-badge" [class.approved]="driver.verificationStatus === 'APPROVED'" [class.pending]="driver.verificationStatus === 'PENDING_APPROVAL'">
+                {{ driver.verificationStatus === 'APPROVED' ? '✓ Verified DL' : '⏳ Under Review' }}
+              </span>
+            </div>
+
+            <div class="driver-card-details">
+              <div class="driver-detail-row">
+                <span class="k">Commercial DL No:</span>
+                <strong class="v">{{ driver.licenseNumber }}</strong>
+              </div>
+              <div class="driver-detail-row">
+                <span class="k">License Category:</span>
+                <span class="v">{{ driver.licenseType }}</span>
+              </div>
+              <div class="driver-detail-row">
+                <span class="k">Experience:</span>
+                <span class="v">{{ driver.experienceYears }} Years Commercial Driving</span>
+              </div>
+            </div>
+
+            <div class="driver-card-actions">
+              <button
+                type="button"
+                class="btn-upload-dl"
+                (click)="openUploadModal('DRIVING_LICENSE', 'driver', driver.id)"
+              >
+                📄 Upload DL Scanned Copy
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tab 3: Verification Documents & Uploads -->
+    @if (activeTab() === 'documents') {
+      <div class="compliance-section">
+        <div class="compliance-card">
+          <h3>📋 Verification Document Checklist</h3>
+          <p>LocalConnect ensures all marketplace resources satisfy Indian transport safety regulations.</p>
+
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Document Type</th>
+                <th>Target Subject</th>
+                <th>Validation Criteria</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Registration Certificate (RC)</strong></td>
+                <td>Mahindra Bolero Camper</td>
+                <td>Valid commercial yellow-board registration</td>
+                <td><span class="verify-badge approved">✓ Approved</span></td>
+              </tr>
+              <tr>
+                <td><strong>Commercial Driving License (DL)</strong></td>
+                <td>Suresh Sharma</td>
+                <td>Valid commercial endorsement (HMV/LMV)</td>
+                <td><span class="verify-badge approved">✓ Approved</span></td>
+              </tr>
+              <tr>
+                <td><strong>Fitness / Pollution Certificate</strong></td>
+                <td>Tata Ace Mini Truck</td>
+                <td>Valid within 6 months</td>
+                <td><span class="verify-badge pending">⏳ Review Pending</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Add Resource Modal -->
+  @if (showAddResourceModal()) {
+    <div class="modal-backdrop" (click)="closeAddResourceModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ 'RESOURCE_MGMT.MODAL_TITLE' | translate }}</h2>
+          <button type="button" class="modal-close-btn" (click)="closeAddResourceModal()">&times;</button>
+        </div>
+
+        <form class="modal-form" (submit)="$event.preventDefault(); saveResource()">
+          <div class="form-group">
+            <label for="new-cat">{{ 'RESOURCE_MGMT.CATEGORY' | translate }} *</label>
+            <select
+              id="new-cat"
+              [ngModel]="newResource().category"
+              (ngModelChange)="updateResourceField('category', $event)"
+              name="cat"
+            >
+              <option value="vehicle">{{ 'CATEGORY.VEHICLE' | translate }}</option>
+              <option value="room">{{ 'CATEGORY.ROOM' | translate }}</option>
+              <option value="transport">{{ 'CATEGORY.TRANSPORT' | translate }}</option>
+              <option value="emergency">{{ 'CATEGORY.EMERGENCY' | translate }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="new-name">{{ 'RESOURCE_MGMT.NAME' | translate }} *</label>
+            <input
+              id="new-name"
+              type="text"
+              required
+              [ngModel]="newResource().name"
+              (ngModelChange)="updateResourceField('name', $event)"
+              name="name"
+              [attr.placeholder]="'RESOURCE_MGMT.NAME_PLACEHOLDER' | translate"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="new-type">{{ 'RESOURCE_MGMT.TYPE' | translate }}</label>
+              <input
+                id="new-type"
+                type="text"
+                [ngModel]="newResource().type"
+                (ngModelChange)="updateResourceField('type', $event)"
+                name="type"
+                [attr.placeholder]="'RESOURCE_MGMT.TYPE_PLACEHOLDER' | translate"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="new-cap">{{ 'RESOURCE_MGMT.CAPACITY' | translate }}</label>
+              <input
+                id="new-cap"
+                type="text"
+                [ngModel]="newResource().capacity"
+                (ngModelChange)="updateResourceField('capacity', $event)"
+                name="cap"
+                [attr.placeholder]="'RESOURCE_MGMT.CAPACITY_PLACEHOLDER' | translate"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="new-price">{{ 'RESOURCE_MGMT.PRICING' | translate }} *</label>
+              <input
+                id="new-price"
+                type="text"
+                required
+                [ngModel]="newResource().pricing"
+                (ngModelChange)="updateResourceField('pricing', $event)"
+                name="price"
+                placeholder="e.g. 2200"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="new-basis">{{ 'RESOURCE_MGMT.PRICING_BASIS' | translate }}</label>
+              <select
+                id="new-basis"
+                [ngModel]="newResource().pricingBasis"
+                (ngModelChange)="updateResourceField('pricingBasis', $event)"
+                name="basis"
+              >
+                <option value="per trip">{{ 'RESOURCE_MGMT.PER_TRIP' | translate }}</option>
+                <option value="per night">{{ 'RESOURCE_MGMT.PER_NIGHT' | translate }}</option>
+                <option value="per km">{{ 'RESOURCE_MGMT.PER_KM' | translate }}</option>
+                <option value="negotiable">{{ 'RESOURCE_MGMT.NEGOTIABLE' | translate }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="new-desc">{{ 'RESOURCE_MGMT.DESCRIPTION' | translate }}</label>
+            <textarea
+              id="new-desc"
+              rows="3"
+              [ngModel]="newResource().description"
+              (ngModelChange)="updateResourceField('description', $event)"
+              name="desc"
+              [attr.placeholder]="'RESOURCE_MGMT.DESC_PLACEHOLDER' | translate"
+            ></textarea>
+          </div>
+
+          <div class="modal-notice">
+            <span>ℹ️ New listings are registered as <strong>Pending Admin Review</strong> and require RC verification before public display.</span>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeAddResourceModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Save & Submit for Approval</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Add Driver Modal -->
+  @if (showAddDriverModal()) {
+    <div class="modal-backdrop" (click)="closeAddDriverModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>👤 Register Certified Driver</h2>
+          <button type="button" class="modal-close-btn" (click)="closeAddDriverModal()">&times;</button>
+        </div>
+
+        <form class="modal-form" (submit)="$event.preventDefault(); saveDriver()">
+          <div class="form-group">
+            <label for="drv-name">Driver Full Name *</label>
+            <input
+              id="drv-name"
+              type="text"
+              required
+              [ngModel]="newDriver().fullName"
+              (ngModelChange)="updateDriverField('fullName', $event)"
+              name="name"
+              placeholder="e.g. Ramesh Verma"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="drv-phone">Driver Phone Number *</label>
+            <input
+              id="drv-phone"
+              type="tel"
+              required
+              [ngModel]="newDriver().phone"
+              (ngModelChange)="updateDriverField('phone', $event)"
+              name="phone"
+              placeholder="+91 98XXX XXXXX"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="drv-dl">Commercial License Number *</label>
+              <input
+                id="drv-dl"
+                type="text"
+                required
+                [ngModel]="newDriver().licenseNumber"
+                (ngModelChange)="updateDriverField('licenseNumber', $event)"
+                name="dl"
+                placeholder="e.g. MP-09-2019-0012345"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="drv-exp">Experience (Years)</label>
+              <input
+                id="drv-exp"
+                type="number"
+                min="1"
+                max="50"
+                [ngModel]="newDriver().experienceYears"
+                (ngModelChange)="updateDriverField('experienceYears', $event)"
+                name="exp"
+              />
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeAddDriverModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Register Driver</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Upload Document Modal -->
+  @if (showUploadDocModal()) {
+    <div class="modal-backdrop" (click)="closeUploadModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>📄 Upload Verification Document</h2>
+          <button type="button" class="modal-close-btn" (click)="closeUploadModal()">&times;</button>
+        </div>
+
+        @if (docSuccessMessage()) {
+          <div class="alert-success">
+            <span>✅ {{ docSuccessMessage() }}</span>
+          </div>
+        }
+
+        <form class="modal-form" (submit)="$event.preventDefault(); submitDocument()">
+          <div class="form-group">
+            <label>Document Type</label>
+            <input
+              type="text"
+              readonly
+              [value]="uploadForm().documentType === 'RC' ? 'Registration Certificate (RC)' : 'Commercial Driving License (DL)'"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="doc-file">Select Scanned File / PDF / Image *</label>
+            <input
+              id="doc-file"
+              type="text"
+              required
+              [ngModel]="uploadForm().fileName"
+              (ngModelChange)="updateUploadField('fileName', $event)"
+              name="filename"
+              placeholder="e.g. bolero_rc_scan.pdf or driver_dl_copy.jpg"
+            />
+            <small class="helper">Supports PDF, JPG, PNG up to 10MB.</small>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeUploadModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Submit to Admin Queue</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

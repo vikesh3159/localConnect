@@ -1,0 +1,190 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="auth-logo" aria-hidden="true"></span>
+      <h1 class="auth-title">{{ 'APP.NAME' | translate }}</h1>
+      <p class="auth-subtitle">{{ 'LOGIN.SUBTITLE' | translate }}</p>
+    </div>
+
+    <!-- Quick Demo Personas -->
+    <div class="demo-personas">
+      <span class="demo-personas-title">⚡ Quick Sign-In (Demo Personas):</span>
+      <div class="personas-buttons">
+        <button type="button" class="persona-btn customer" (click)="quickLogin('9876543210', 'CUSTOMER', 'Ramesh Patel')">
+          👤 <strong>Customer</strong>
+          <small>Ramesh Patel</small>
+        </button>
+        <button type="button" class="persona-btn provider" (click)="quickLogin('9876543211', 'PROVIDER', 'Rajesh Kumar')">
+          🚗 <strong>Provider</strong>
+          <small>Rajesh Kumar</small>
+        </button>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert-error" role="alert">
+        <span>⚠️ {{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (isSuccess()) {
+      <div class="success-box">
+        <span class="success-icon" aria-hidden="true">🎉</span>
+        <h2>{{ (activeTab() === 'login' ? 'LOGIN.SUCCESS_LOGIN_TITLE' : 'LOGIN.SUCCESS_REGISTER_TITLE') | translate }}</h2>
+        <p>{{ 'LOGIN.SUCCESS_DESC' | translate }}</p>
+        <div class="success-actions">
+          <a routerLink="/" class="btn-primary">{{ 'NAV.HOME' | translate }}</a>
+          <a routerLink="/my-requests" class="btn-secondary">{{ 'NAV.MY_REQUESTS' | translate }}</a>
+          <a routerLink="/provider-dashboard" class="btn-secondary">{{ 'NAV.PROVIDER_DASHBOARD' | translate }}</a>
+        </div>
+      </div>
+    } @else {
+      <!-- Tabs -->
+      <div class="auth-tabs" role="tablist">
+        <button
+          type="button"
+          class="tab-btn"
+          role="tab"
+          [class.active]="activeTab() === 'login'"
+          [attr.aria-selected]="activeTab() === 'login'"
+          (click)="setTab('login')"
+        >
+          {{ 'LOGIN.LOGIN_TAB' | translate }}
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          role="tab"
+          [class.active]="activeTab() === 'register'"
+          [attr.aria-selected]="activeTab() === 'register'"
+          (click)="setTab('register')"
+        >
+          {{ 'LOGIN.REGISTER_TAB' | translate }}
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      @if (activeTab() === 'login') {
+        <form class="auth-form" (submit)="$event.preventDefault(); onSubmitLogin()">
+          <div class="form-group">
+            <label for="l-phone">{{ 'LOGIN.PHONE' | translate }}</label>
+            <div class="input-with-icon">
+              <span class="input-icon" aria-hidden="true">📱</span>
+              <input
+                id="l-phone"
+                type="tel"
+                required
+                [ngModel]="loginPhone()"
+                (ngModelChange)="loginPhone.set($event)"
+                name="phone"
+                [attr.placeholder]="'LOGIN.PHONE_PLACEHOLDER' | translate"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="l-otp">One-Time Password (OTP)</label>
+            <div class="input-with-icon">
+              <span class="input-icon" aria-hidden="true">🔑</span>
+              <input
+                id="l-otp"
+                type="text"
+                required
+                [ngModel]="loginOtp()"
+                (ngModelChange)="loginOtp.set($event)"
+                name="otp"
+                placeholder="Default: 123456"
+              />
+            </div>
+            <small class="helper-text">Simulated SMS OTP: Use <strong>123456</strong> for testing.</small>
+          </div>
+
+          <button type="submit" class="btn-primary auth-submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <span>Signing In...</span>
+            } @else {
+              <span>{{ 'LOGIN.LOGIN_BTN' | translate }} &rarr;</span>
+            }
+          </button>
+        </form>
+      }
+
+      <!-- Register Form -->
+      @if (activeTab() === 'register') {
+        <form class="auth-form" (submit)="$event.preventDefault(); onSubmitRegister()">
+          <div class="form-group">
+            <label for="r-name">{{ 'LOGIN.NAME' | translate }}</label>
+            <div class="input-with-icon">
+              <span class="input-icon" aria-hidden="true">👤</span>
+              <input
+                id="r-name"
+                type="text"
+                required
+                [ngModel]="regName()"
+                (ngModelChange)="regName.set($event)"
+                name="name"
+                [attr.placeholder]="'LOGIN.NAME_PLACEHOLDER' | translate"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="r-phone">{{ 'LOGIN.PHONE' | translate }}</label>
+            <div class="input-with-icon">
+              <span class="input-icon" aria-hidden="true">📱</span>
+              <input
+                id="r-phone"
+                type="tel"
+                required
+                [ngModel]="regPhone()"
+                (ngModelChange)="regPhone.set($event)"
+                name="phone"
+                [attr.placeholder]="'LOGIN.PHONE_PLACEHOLDER' | translate"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Primary Account Role</label>
+            <div class="role-selector">
+              <label class="radio-card" [class.selected]="regRole() === 'CUSTOMER'">
+                <input
+                  type="radio"
+                  name="role"
+                  value="CUSTOMER"
+                  [checked]="regRole() === 'CUSTOMER'"
+                  (change)="regRole.set('CUSTOMER')"
+                />
+                <div>
+                  <strong>Customer</strong>
+                  <small>Book rides, goods & stays</small>
+                </div>
+              </label>
+              <label class="radio-card" [class.selected]="regRole() === 'PROVIDER'">
+                <input
+                  type="radio"
+                  name="role"
+                  value="PROVIDER"
+                  [checked]="regRole() === 'PROVIDER'"
+                  (change)="regRole.set('PROVIDER')"
+                />
+                <div>
+                  <strong>Local Provider</strong>
+                  <small>List vehicles & fleet</small>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary auth-submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <span>Creating Account...</span>
+            } @else {
+              <span>{{ 'LOGIN.REGISTER_BTN' | translate }} &rarr;</span>
+            }
+          </button>
+        </form>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,61 @@
+.not-found-page {
+  padding: 4rem 1rem;
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 200px);
+}
+
+.not-found-card {
+  text-align: center;
+  max-width: 480px;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius);
+  padding: 3rem 2rem;
+  box-shadow: var(--lc-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  .error-code {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--lc-primary);
+    letter-spacing: -0.04em;
+  }
+
+  .error-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--lc-text);
+    margin: 0;
+  }
+
+  .error-desc {
+    color: var(--lc-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0 0 1rem;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0 1.5rem;
+    border-radius: var(--lc-radius-sm);
+    background: var(--lc-primary);
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+
+    &:hover {
+      background: var(--lc-primary-dark);
+      text-decoration: none;
+    }
+  }
+}
+

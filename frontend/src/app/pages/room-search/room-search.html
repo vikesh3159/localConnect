@@ -1,0 +1,129 @@
+<section class="room-search-page">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/">{{ 'NAV.HOME' | translate }}</a>
+    <span class="separator">›</span>
+    <span class="current">{{ 'ROOM_SEARCH.TITLE' | translate }}</span>
+  </nav>
+
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-icon">🏠</div>
+    <h1>{{ 'ROOM_SEARCH.TITLE' | translate }}</h1>
+    <p class="subtitle">{{ 'ROOM_SEARCH.SUBTITLE' | translate }}</p>
+  </header>
+
+  <!-- Search Form Card -->
+  <div class="form-card">
+    <form (ngSubmit)="onSubmit()" novalidate>
+      <!-- Location -->
+      <div class="form-group">
+        <label for="location">{{ 'ROOM_SEARCH.LOCATION' | translate }} <span class="required">*</span></label>
+        <input
+          id="location"
+          type="text"
+          [ngModel]="form().location"
+          (ngModelChange)="updateField('location', $event)"
+          name="location"
+          [attr.placeholder]="'ROOM_SEARCH.LOCATION_PLACEHOLDER' | translate"
+          [class.invalid]="locationError()"
+        />
+        @if (locationError()) {
+          <span class="error-msg">{{ 'ROOM_SEARCH.LOCATION_REQUIRED' | translate }}</span>
+        }
+      </div>
+
+      <!-- Dates Row -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="checkIn">{{ 'ROOM_SEARCH.CHECK_IN' | translate }} <span class="required">*</span></label>
+          <input
+            id="checkIn"
+            type="date"
+            [ngModel]="form().checkIn"
+            (ngModelChange)="updateField('checkIn', $event)"
+            name="checkIn"
+            [min]="today"
+            [class.invalid]="checkInError() || checkInPastError()"
+          />
+          @if (checkInError()) {
+            <span class="error-msg">{{ 'ROOM_SEARCH.CHECK_IN_REQUIRED' | translate }}</span>
+          }
+          @if (checkInPastError()) {
+            <span class="error-msg">{{ 'ROOM_SEARCH.CHECK_IN_PAST' | translate }}</span>
+          }
+        </div>
+        <div class="form-group">
+          <label for="checkOut">{{ 'ROOM_SEARCH.CHECK_OUT' | translate }} <span class="required">*</span></label>
+          <input
+            id="checkOut"
+            type="date"
+            [ngModel]="form().checkOut"
+            (ngModelChange)="updateField('checkOut', $event)"
+            name="checkOut"
+            [min]="minCheckOut()"
+            [class.invalid]="checkOutError() || checkOutBeforeError()"
+          />
+          @if (checkOutError()) {
+            <span class="error-msg">{{ 'ROOM_SEARCH.CHECK_OUT_REQUIRED' | translate }}</span>
+          }
+          @if (checkOutBeforeError()) {
+            <span class="error-msg">{{ 'ROOM_SEARCH.CHECK_OUT_BEFORE' | translate }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Counters Row -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ 'ROOM_SEARCH.GUESTS' | translate }}</label>
+          <div class="counter-control">
+            <button type="button" class="counter-btn" (click)="decrementGuests()" [disabled]="form().guests <= 1" aria-label="Decrease guests">−</button>
+            <span class="counter-value">{{ form().guests }}</span>
+            <button type="button" class="counter-btn" (click)="incrementGuests()" aria-label="Increase guests">+</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{ 'ROOM_SEARCH.ROOMS' | translate }}</label>
+          <div class="counter-control">
+            <button type="button" class="counter-btn" (click)="decrementRooms()" [disabled]="form().rooms <= 1" aria-label="Decrease rooms">−</button>
+            <span class="counter-value">{{ form().rooms }}</span>
+            <button type="button" class="counter-btn" (click)="incrementRooms()" aria-label="Increase rooms">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room Type -->
+      <div class="form-group">
+        <label for="roomType">{{ 'ROOM_SEARCH.ROOM_TYPE' | translate }} <span class="required">*</span></label>
+        <select
+          id="roomType"
+          [ngModel]="form().roomType"
+          (ngModelChange)="updateField('roomType', $event)"
+          name="roomType"
+          [class.invalid]="roomTypeError()"
+          [class.placeholder]="!form().roomType"
+        >
+          <option value="" disabled>{{ 'ROOM_SEARCH.SELECT_ROOM_TYPE' | translate }}</option>
+          @for (opt of roomTypeOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
+          }
+        </select>
+        @if (roomTypeError()) {
+          <span class="error-msg">{{ 'ROOM_SEARCH.ROOM_TYPE_REQUIRED' | translate }}</span>
+        }
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          <span class="btn-icon">🔍</span>
+          {{ 'ROOM_SEARCH.SEARCH' | translate }}
+        </button>
+        <button type="button" class="btn-secondary" (click)="onReset()">
+          {{ 'ROOM_SEARCH.RESET' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

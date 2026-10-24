@@ -1,0 +1,211 @@
+<div class="search-page">
+  <div class="search-container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/">{{ 'NAV.HOME' | translate }}</a>
+      <span class="sep" aria-hidden="true">&rsaquo;</span>
+      <span class="current">{{ 'TRANSPORT_SEARCH.BREADCRUMB' | translate }}</span>
+    </nav>
+
+    <div class="page-heading">
+      <div class="heading-badge transport-badge">
+        <span aria-hidden="true">🚚</span>
+        <span>{{ 'TRANSPORT_SEARCH.CATEGORY_LABEL' | translate }}</span>
+      </div>
+      <h1>{{ 'TRANSPORT_SEARCH.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'TRANSPORT_SEARCH.SUBTITLE' | translate }}</p>
+    </div>
+
+    <form class="search-card" (submit)="$event.preventDefault(); searchTransport()">
+      <!-- Pickup Location -->
+      <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['pickup']">
+        <label for="pickup-loc">
+          <span>{{ 'TRANSPORT_SEARCH.PICKUP' | translate }}</span>
+          <span class="required" aria-hidden="true">*</span>
+        </label>
+        <div class="input-with-icon">
+          <span class="input-icon" aria-hidden="true">📍</span>
+          <input
+            id="pickup-loc"
+            type="text"
+            [value]="searchForm().pickup"
+            (input)="updateField('pickup', $any($event.target).value)"
+            [attr.placeholder]="'TRANSPORT_SEARCH.PICKUP_PLACEHOLDER' | translate"
+            autocomplete="off"
+          />
+        </div>
+        @if (isSubmitted() && formErrors()['pickup']) {
+          <p class="error-msg">{{ formErrors()['pickup'] | translate }}</p>
+        }
+      </div>
+
+      <!-- Destination -->
+      <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['destination']">
+        <label for="dest-loc">
+          <span>{{ 'TRANSPORT_SEARCH.DESTINATION' | translate }}</span>
+          <span class="required" aria-hidden="true">*</span>
+        </label>
+        <div class="input-with-icon">
+          <span class="input-icon" aria-hidden="true">🎯</span>
+          <input
+            id="dest-loc"
+            type="text"
+            [value]="searchForm().destination"
+            (input)="updateField('destination', $any($event.target).value)"
+            [attr.placeholder]="'TRANSPORT_SEARCH.DESTINATION_PLACEHOLDER' | translate"
+            autocomplete="off"
+          />
+        </div>
+        @if (isSubmitted() && formErrors()['destination']) {
+          <p class="error-msg">{{ formErrors()['destination'] | translate }}</p>
+        }
+      </div>
+
+      <!-- Date & Time Row -->
+      <div class="form-row">
+        <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['date']">
+          <label for="trans-date">
+            <span>{{ 'TRANSPORT_SEARCH.DATE' | translate }}</span>
+            <span class="required" aria-hidden="true">*</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon" aria-hidden="true">📅</span>
+            <input
+              id="trans-date"
+              type="date"
+              [min]="todayDate"
+              [value]="searchForm().date"
+              (input)="updateField('date', $any($event.target).value)"
+            />
+          </div>
+          @if (isSubmitted() && formErrors()['date']) {
+            <p class="error-msg">{{ formErrors()['date'] | translate }}</p>
+          }
+        </div>
+
+        <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['time']">
+          <label for="trans-time">
+            <span>{{ 'TRANSPORT_SEARCH.TIME' | translate }}</span>
+            <span class="required" aria-hidden="true">*</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon" aria-hidden="true">⏰</span>
+            <input
+              id="trans-time"
+              type="time"
+              [value]="searchForm().time"
+              (input)="updateField('time', $any($event.target).value)"
+            />
+          </div>
+          @if (isSubmitted() && formErrors()['time']) {
+            <p class="error-msg">{{ formErrors()['time'] | translate }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Goods Type & Load Description -->
+      <div class="form-row">
+        <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['goodsType']">
+          <label for="goods-select">
+            <span>{{ 'TRANSPORT_SEARCH.GOODS_TYPE' | translate }}</span>
+            <span class="required" aria-hidden="true">*</span>
+          </label>
+          <div class="select-wrapper">
+            <select
+              id="goods-select"
+              [value]="searchForm().goodsType"
+              (change)="updateField('goodsType', $any($event.target).value)"
+            >
+              <option value="">{{ 'TRANSPORT_SEARCH.SELECT_GOODS' | translate }}</option>
+              @for (g of goodsTypes; track g.value) {
+                <option [value]="g.value">{{ g.labelKey | translate }}</option>
+              }
+            </select>
+          </div>
+          @if (isSubmitted() && formErrors()['goodsType']) {
+            <p class="error-msg">{{ formErrors()['goodsType'] | translate }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="load-input">
+            <span>{{ 'TRANSPORT_SEARCH.LOAD_DESCRIPTION' | translate }}</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon" aria-hidden="true">📦</span>
+            <input
+              id="load-input"
+              type="text"
+              [value]="searchForm().loadDescription"
+              (input)="updateField('loadDescription', $any($event.target).value)"
+              [attr.placeholder]="'TRANSPORT_SEARCH.LOAD_PLACEHOLDER' | translate"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Type & Vehicles Required Counter -->
+      <div class="form-row">
+        <div class="form-group" [class.has-error]="isSubmitted() && formErrors()['vehicleType']">
+          <label for="v-type-select">
+            <span>{{ 'TRANSPORT_SEARCH.VEHICLE_TYPE' | translate }}</span>
+            <span class="required" aria-hidden="true">*</span>
+          </label>
+          <div class="select-wrapper">
+            <select
+              id="v-type-select"
+              [value]="searchForm().vehicleType"
+              (change)="updateField('vehicleType', $any($event.target).value)"
+            >
+              <option value="">{{ 'TRANSPORT_SEARCH.SELECT_VEHICLE' | translate }}</option>
+              @for (v of vehicleTypes; track v.value) {
+                <option [value]="v.value">{{ v.labelKey | translate }}</option>
+              }
+            </select>
+          </div>
+          @if (isSubmitted() && formErrors()['vehicleType']) {
+            <p class="error-msg">{{ formErrors()['vehicleType'] | translate }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>
+            <span>{{ 'TRANSPORT_SEARCH.VEHICLES_REQUIRED' | translate }}</span>
+          </label>
+          <div class="counter-control" role="group">
+            <button
+              type="button"
+              class="counter-btn"
+              [disabled]="searchForm().vehiclesRequired <= 1"
+              (click)="changeVehiclesRequired(-1)"
+              [attr.aria-label]="'VEHICLE_SEARCH.DECREASE_VEHICLES' | translate"
+            >&minus;</button>
+            <span class="counter-value">{{ searchForm().vehiclesRequired }}</span>
+            <button
+              type="button"
+              class="counter-btn"
+              (click)="changeVehiclesRequired(1)"
+              [attr.aria-label]="'VEHICLE_SEARCH.INCREASE_VEHICLES' | translate"
+            >&plus;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Route Note Callout -->
+      <div class="info-callout">
+        <span class="info-icon" aria-hidden="true">💡</span>
+        <p class="info-text">{{ 'TRANSPORT_SEARCH.ROUTE_NOTE' | translate }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary search-submit-btn">
+          {{ 'TRANSPORT_SEARCH.FIND_TRANSPORT' | translate }} &rarr;
+        </button>
+        <button type="button" class="btn-secondary" (click)="resetForm()">
+          {{ 'COMMON.RESET' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

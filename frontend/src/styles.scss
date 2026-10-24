@@ -1,0 +1,94 @@
+:root {
+  --lc-primary: #197a3b;
+  --lc-primary-dark: #145e2f;
+  --lc-primary-light: #e5f6ec;
+  --lc-primary-lighter: #f0f9f3;
+  --lc-surface: #ffffff;
+  --lc-bg: #f7fbf8;
+  --lc-bg-gradient: linear-gradient(180deg, #f8fcf9, #edf7f2 44%, #f8faf7);
+  --lc-text: #102016;
+  --lc-text-secondary: #526157;
+  --lc-text-muted: #7a8f82;
+  --lc-border: #d8e8dd;
+  --lc-border-focus: #197a3b;
+  --lc-danger: #b02d22;
+  --lc-danger-light: #fff4f2;
+  --lc-danger-border: #f0beb8;
+  --lc-info: #245f9d;
+  --lc-info-light: #f4f8ff;
+  --lc-info-border: #cbd8e6;
+  --lc-warning: #d97706;
+  --lc-warning-light: #fffbeb;
+  --lc-success: #059669;
+  --lc-success-light: #ecfdf5;
+  --lc-vehicle-bg: #e4f1ff;
+  --lc-vehicle-accent: #2563eb;
+  --lc-room-bg: #e5f6ec;
+  --lc-room-accent: #059669;
+  --lc-transport-bg: #fff0cf;
+  --lc-transport-accent: #d97706;
+  --lc-emergency-bg: #ffe2df;
+  --lc-emergency-accent: #dc2626;
+  --lc-radius: 0.75rem;
+  --lc-radius-sm: 0.5rem;
+  --lc-radius-lg: 1rem;
+  --lc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --lc-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --lc-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --lc-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --lc-font: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --lc-max-width: 1120px;
+  --lc-input-height: 3rem;
+  --lc-transition: 150ms ease;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: var(--lc-font);
+  color: var(--lc-text);
+  background: var(--lc-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--lc-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--lc-primary);
+  outline-offset: 2px;
+}

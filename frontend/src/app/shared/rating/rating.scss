@@ -1,0 +1,23 @@
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--lc-text);
+
+  &__star {
+    color: #eab308;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  &__value {
+    font-weight: 700;
+  }
+
+  &__count {
+    color: var(--lc-text-secondary);
+    font-size: 0.8rem;
+  }
+}
+

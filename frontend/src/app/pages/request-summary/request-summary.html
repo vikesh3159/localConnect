@@ -1,0 +1,50 @@
+<div class="summary-page">
+  <div class="summary-card" [class]="'summary-card--' + category()">
+    <!-- Category Header -->
+    <div class="summary-card__header">
+      <span class="summary-card__icon">{{ getCategoryIcon() }}</span>
+      <div>
+        <h1 class="summary-card__title">{{ 'REQUEST_SUMMARY.TITLE' | translate }}</h1>
+        <p class="summary-card__category">{{ 'CATEGORY.' + (category() || '').toUpperCase() | translate }}</p>
+      </div>
+    </div>
+
+    <!-- Provider Info -->
+    <div class="summary-card__provider">
+      <div class="summary-card__provider-row">
+        <span class="summary-card__provider-label">{{ 'REQUEST_SUMMARY.RESOURCE' | translate }}</span>
+        <span class="summary-card__provider-value">{{ resourceName() }}</span>
+      </div>
+      <div class="summary-card__provider-row">
+        <span class="summary-card__provider-label">{{ 'REQUEST_SUMMARY.PROVIDER' | translate }}</span>
+        <span class="summary-card__provider-value">{{ providerName() }}</span>
+      </div>
+    </div>
+
+    <!-- Summary Details -->
+    <dl class="summary-details">
+      @for (item of summaryItems(); track item.label) {
+        <div class="summary-details__row">
+          <dt class="summary-details__label">{{ item.label | translate }}</dt>
+          <dd class="summary-details__value">{{ item.value }}</dd>
+        </div>
+      }
+    </dl>
+
+    <!-- Demo Notice -->
+    <div class="demo-notice">
+      <span class="demo-notice__icon">ℹ️</span>
+      <p class="demo-notice__text">{{ 'REQUEST_SUMMARY.DEMO_NOTICE' | translate }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="summary-actions">
+      <button class="btn-secondary" (click)="goBack()">
+        ← {{ 'REQUEST_SUMMARY.GO_BACK' | translate }}
+      </button>
+      <button class="btn-primary" (click)="confirmRequest()">
+        ✓ {{ 'REQUEST_SUMMARY.CONFIRM' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

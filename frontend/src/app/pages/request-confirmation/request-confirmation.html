@@ -1,0 +1,69 @@
+<div class="confirmation-page">
+  @if (request(); as req) {
+    <div class="confirmation-card">
+      <!-- Success Icon -->
+      <div class="confirmation-card__success">
+        <span class="confirmation-card__checkmark">✅</span>
+      </div>
+
+      <h1 class="confirmation-card__title">{{ 'CONFIRMATION.TITLE' | translate }}</h1>
+
+      <!-- Reference Number -->
+      <div class="confirmation-card__ref">
+        <span class="confirmation-card__ref-label">{{ 'CONFIRMATION.REFERENCE' | translate }}</span>
+        <span class="confirmation-card__ref-value">{{ req.referenceNumber }}</span>
+      </div>
+
+      <!-- Category & Status -->
+      <div class="confirmation-card__meta">
+        <span class="confirmation-card__category">
+          {{ getCategoryIcon() }} {{ 'CATEGORY.' + req.category.toUpperCase() | translate }}
+        </span>
+        <app-status-badge [status]="req.status" />
+      </div>
+
+      <!-- Summary -->
+      <div class="confirmation-card__summary">
+        <h3 class="confirmation-card__summary-title">{{ 'CONFIRMATION.SUMMARY' | translate }}</h3>
+        @for (entry of getSummaryEntries(); track entry.key) {
+          <div class="confirmation-card__summary-row">
+            <span class="confirmation-card__summary-key">{{ entry.key | translate }}</span>
+            <span class="confirmation-card__summary-val">{{ entry.value }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Provider -->
+      <div class="confirmation-card__provider">
+        <span>{{ 'CONFIRMATION.PROVIDER' | translate }}:</span>
+        <strong>{{ req.providerName }}</strong>
+      </div>
+
+      <!-- Demo Notice -->
+      <div class="demo-notice">
+        <span class="demo-notice__icon">ℹ️</span>
+        <p class="demo-notice__text">{{ 'CONFIRMATION.DEMO_NOTICE' | translate }}</p>
+      </div>
+
+      <!-- Next Steps -->
+      <p class="confirmation-card__next-steps">{{ 'CONFIRMATION.NEXT_STEPS' | translate }}</p>
+
+      <!-- Actions -->
+      <div class="confirmation-actions">
+        <a routerLink="/my-requests" class="btn-primary">
+          📋 {{ 'CONFIRMATION.VIEW_REQUESTS' | translate }}
+        </a>
+        <a routerLink="/" class="btn-secondary">
+          🏠 {{ 'CONFIRMATION.BACK_HOME' | translate }}
+        </a>
+      </div>
+    </div>
+  } @else {
+    <!-- Not Found -->
+    <div class="not-found">
+      <span class="not-found__icon">❌</span>
+      <h2 class="not-found__title">{{ 'CONFIRMATION.NOT_FOUND' | translate }}</h2>
+      <a routerLink="/" class="btn-primary">{{ 'CONFIRMATION.BACK_HOME' | translate }}</a>
+    </div>
+  }
+</div>

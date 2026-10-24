@@ -1,0 +1,174 @@
+<div class="home-page">
+  <!-- Hero Section -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-content">
+      <span class="eyebrow">{{ 'HOME.EYEBROW' | translate }}</span>
+      <h1 id="hero-title">{{ 'APP.TAGLINE' | translate }}</h1>
+      <p class="hero-lead">{{ 'HOME.SUPPORTING_TEXT' | translate }}</p>
+      <div class="hero-actions">
+        <a href="#categories" class="btn-primary hero-btn">{{ 'HOME.EXPLORE_SERVICES' | translate }}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section id="categories" class="categories-section" aria-labelledby="categories-title">
+    <div class="section-header">
+      <span class="eyebrow">{{ 'HOME.QUICK_HELP' | translate }}</span>
+      <h2 id="categories-title">{{ 'HOME.CATEGORIES_TITLE' | translate }}</h2>
+      <p class="section-desc">{{ 'HOME.CATEGORIES_SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="category-grid">
+      <!-- Vehicle Card -->
+      <a routerLink="/vehicle-search" class="category-card vehicle-card">
+        <div class="card-icon-wrap vehicle-icon" aria-hidden="true">
+          <span class="card-icon">🚗</span>
+        </div>
+        <div class="card-copy">
+          <h3 class="card-title">{{ 'HOME.CATEGORIES.VEHICLE.TITLE' | translate }}</h3>
+          <p class="card-desc">{{ 'HOME.CATEGORIES.VEHICLE.DESCRIPTION' | translate }}</p>
+          <span class="card-action">
+            {{ 'COMMON.SEARCH' | translate }} &rarr;
+          </span>
+        </div>
+      </a>
+
+      <!-- Room Card -->
+      <a routerLink="/room-search" class="category-card room-card">
+        <div class="card-icon-wrap room-icon" aria-hidden="true">
+          <span class="card-icon">🏠</span>
+        </div>
+        <div class="card-copy">
+          <h3 class="card-title">{{ 'HOME.CATEGORIES.ROOM.TITLE' | translate }}</h3>
+          <p class="card-desc">{{ 'HOME.CATEGORIES.ROOM.DESCRIPTION' | translate }}</p>
+          <span class="card-action">
+            {{ 'COMMON.SEARCH' | translate }} &rarr;
+          </span>
+        </div>
+      </a>
+
+      <!-- Transport Card -->
+      <a routerLink="/transport-search" class="category-card transport-card">
+        <div class="card-icon-wrap transport-icon" aria-hidden="true">
+          <span class="card-icon">🚚</span>
+        </div>
+        <div class="card-copy">
+          <h3 class="card-title">{{ 'HOME.CATEGORIES.TRANSPORT.TITLE' | translate }}</h3>
+          <p class="card-desc">{{ 'HOME.CATEGORIES.TRANSPORT.DESCRIPTION' | translate }}</p>
+          <span class="card-action">
+            {{ 'COMMON.SEARCH' | translate }} &rarr;
+          </span>
+        </div>
+      </a>
+
+      <!-- Emergency Card -->
+      <a routerLink="/emergency" class="category-card emergency-card">
+        <div class="card-icon-wrap emergency-icon" aria-hidden="true">
+          <span class="card-icon">🚨</span>
+        </div>
+        <div class="card-copy">
+          <h3 class="card-title">{{ 'HOME.CATEGORIES.EMERGENCY.TITLE' | translate }}</h3>
+          <p class="card-desc">{{ 'HOME.CATEGORIES.EMERGENCY.DESCRIPTION' | translate }}</p>
+          <span class="card-action emergency-action">
+            {{ 'HOME.URGENT.BUTTON' | translate }} &rarr;
+          </span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section" aria-labelledby="how-title">
+    <div class="section-header">
+      <span class="eyebrow">{{ 'HOME.HOW_IT_WORKS.EYEBROW' | translate }}</span>
+      <h2 id="how-title">{{ 'HOME.HOW_IT_WORKS.TITLE' | translate }}</h2>
+      <p class="section-desc">{{ 'HOME.HOW_IT_WORKS.SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number" aria-hidden="true">1</div>
+        <div class="step-icon" aria-hidden="true">🔍</div>
+        <h3 class="step-title">{{ 'HOME.HOW_IT_WORKS.STEP1_TITLE' | translate }}</h3>
+        <p class="step-desc">{{ 'HOME.HOW_IT_WORKS.STEP1_DESC' | translate }}</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number" aria-hidden="true">2</div>
+        <div class="step-icon" aria-hidden="true">📝</div>
+        <h3 class="step-title">{{ 'HOME.HOW_IT_WORKS.STEP2_TITLE' | translate }}</h3>
+        <p class="step-desc">{{ 'HOME.HOW_IT_WORKS.STEP2_DESC' | translate }}</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number" aria-hidden="true">3</div>
+        <div class="step-icon" aria-hidden="true">📋</div>
+        <h3 class="step-title">{{ 'HOME.HOW_IT_WORKS.STEP3_TITLE' | translate }}</h3>
+        <p class="step-desc">{{ 'HOME.HOW_IT_WORKS.STEP3_DESC' | translate }}</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number" aria-hidden="true">4</div>
+        <div class="step-icon" aria-hidden="true">🤝</div>
+        <h3 class="step-title">{{ 'HOME.HOW_IT_WORKS.STEP4_TITLE' | translate }}</h3>
+        <p class="step-desc">{{ 'HOME.HOW_IT_WORKS.STEP4_DESC' | translate }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits-section" aria-labelledby="benefits-title">
+    <div class="section-header">
+      <span class="eyebrow">{{ 'HOME.BENEFITS.EYEBROW' | translate }}</span>
+      <h2 id="benefits-title">{{ 'HOME.BENEFITS.TITLE' | translate }}</h2>
+    </div>
+
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <span class="benefit-icon" aria-hidden="true">🏘️</span>
+        <h3>{{ 'HOME.BENEFITS.LOCAL_TITLE' | translate }}</h3>
+        <p>{{ 'HOME.BENEFITS.LOCAL_DESC' | translate }}</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-icon" aria-hidden="true">💰</span>
+        <h3>{{ 'HOME.BENEFITS.PRICING_TITLE' | translate }}</h3>
+        <p>{{ 'HOME.BENEFITS.PRICING_DESC' | translate }}</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-icon" aria-hidden="true">⚡</span>
+        <h3>{{ 'HOME.BENEFITS.FAST_TITLE' | translate }}</h3>
+        <p>{{ 'HOME.BENEFITS.FAST_DESC' | translate }}</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-icon" aria-hidden="true">📱</span>
+        <h3>{{ 'HOME.BENEFITS.SIMPLE_TITLE' | translate }}</h3>
+        <p>{{ 'HOME.BENEFITS.SIMPLE_DESC' | translate }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Urgent Assistance Banner -->
+  <section class="urgent-banner" aria-labelledby="urgent-title">
+    <div class="urgent-content">
+      <span class="urgent-eyebrow">{{ 'HOME.URGENT.LABEL' | translate }}</span>
+      <h2 id="urgent-title">{{ 'HOME.URGENT.TITLE' | translate }}</h2>
+      <p>{{ 'HOME.URGENT.DESCRIPTION' | translate }}</p>
+    </div>
+    <a routerLink="/emergency" class="btn-urgent">{{ 'HOME.URGENT.BUTTON' | translate }}</a>
+  </section>
+
+  <!-- Provider Call to Action -->
+  <section class="provider-banner" aria-labelledby="provider-title">
+    <div class="provider-content">
+      <span class="provider-eyebrow">{{ 'HOME.PROVIDER.LABEL' | translate }}</span>
+      <h2 id="provider-title">{{ 'HOME.PROVIDER.TITLE' | translate }}</h2>
+      <p>{{ 'HOME.PROVIDER.DESCRIPTION' | translate }}</p>
+    </div>
+    <a routerLink="/provider-dashboard" class="btn-provider">{{ 'HOME.PROVIDER.BUTTON' | translate }}</a>
+  </section>
+</div>
+

@@ -1,0 +1,172 @@
+<section class="results-page">
+  <div class="results-container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/">{{ 'NAV.HOME' | translate }}</a>
+      <span class="sep" aria-hidden="true">&rsaquo;</span>
+      <a routerLink="/transport-search">{{ 'TRANSPORT_SEARCH.BREADCRUMB' | translate }}</a>
+      <span class="sep" aria-hidden="true">&rsaquo;</span>
+      <span class="current">{{ 'TRANSPORT_RESULTS.TITLE' | translate }}</span>
+    </nav>
+
+    <!-- Search Summary Card -->
+    @if (hasSearch()) {
+      <div class="search-summary-card">
+        <div class="summary-details">
+          <div class="summary-item">
+            <span class="summary-icon" aria-hidden="true">📍</span>
+            <span class="summary-label">{{ 'TRANSPORT_SEARCH.PICKUP' | translate }}:</span>
+            <strong class="summary-val">{{ search().pickup || '-' }}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-icon" aria-hidden="true">🎯</span>
+            <span class="summary-label">{{ 'TRANSPORT_SEARCH.DESTINATION' | translate }}:</span>
+            <strong class="summary-val">{{ search().destination || '-' }}</strong>
+          </div>
+          @if (search().date) {
+            <div class="summary-item">
+              <span class="summary-icon" aria-hidden="true">📅</span>
+              <strong class="summary-val">{{ search().date }} @if (search().time) {({{ search().time }})}</strong>
+            </div>
+          }
+          @if (goodsTypeLabel()) {
+            <div class="summary-item">
+              <span class="summary-badge goods-badge">{{ goodsTypeLabel() | translate }}</span>
+            </div>
+          }
+          @if (vehicleTypeLabel()) {
+            <div class="summary-item">
+              <span class="summary-badge vehicle-badge">{{ vehicleTypeLabel() | translate }}</span>
+            </div>
+          }
+        </div>
+        <button type="button" class="btn-edit-search" (click)="onEditSearch()">
+          <span aria-hidden="true">✏️</span>
+          <span>{{ 'TRANSPORT_RESULTS.EDIT_SEARCH' | translate }}</span>
+        </button>
+      </div>
+    }
+
+    <!-- Availability & Conceptual Rule Note -->
+    <div class="info-banner">
+      <span class="banner-icon" aria-hidden="true">ℹ️</span>
+      <p class="banner-text">{{ 'TRANSPORT_RESULTS.AVAILABILITY_NOTE' | translate }}</p>
+    </div>
+
+    <!-- Page Title & Count -->
+    <div class="results-header">
+      <div>
+        <h1>{{ 'TRANSPORT_RESULTS.TITLE' | translate }}</h1>
+        <p class="results-subtitle">{{ 'TRANSPORT_RESULTS.SUBTITLE' | translate }}</p>
+      </div>
+      @if (!loading() && results().length > 0) {
+        <span class="results-count-badge">
+          {{ 'TRANSPORT_RESULTS.RESULTS_FOUND' | translate: { count: results().length } }}
+        </span>
+      }
+    </div>
+
+    <!-- Loading Skeleton -->
+    @if (loading()) {
+      <div class="results-grid">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="skeleton-card">
+            <div class="skeleton-img"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line text"></div>
+              <div class="skeleton-line text short"></div>
+              <div class="skeleton-actions">
+                <div class="skeleton-btn"></div>
+                <div class="skeleton-btn"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && results().length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon" aria-hidden="true">🚚</span>
+        <h2>{{ 'TRANSPORT_RESULTS.NO_RESULTS_TITLE' | translate }}</h2>
+        <p>{{ 'TRANSPORT_RESULTS.NO_RESULTS_DESC' | translate }}</p>
+        <button type="button" class="btn-primary" (click)="onEditSearch()">
+          {{ 'TRANSPORT_RESULTS.MODIFY_SEARCH' | translate }}
+        </button>
+      </div>
+    }
+
+    <!-- Results Cards Grid -->
+    @if (!loading() && results().length > 0) {
+      <div class="results-grid">
+        @for (transport of results(); track transport.id) {
+          <article class="result-card">
+            <div class="card-visual">
+              <span class="transport-emoji" aria-hidden="true">{{ transport.imageEmoji }}</span>
+              <div class="card-badges">
+                <span class="badge-capacity">
+                  <span aria-hidden="true">⚖️</span>
+                  <span>{{ transport.loadCapacity }}</span>
+                </span>
+                <app-demo-badge />
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="card-header-row">
+                <div>
+                  <h2 class="transport-name">{{ transport.vehicleName }}</h2>
+                  <span class="transport-type-tag">{{ 'TRANSPORT_TYPES.' + transport.type.toUpperCase().replace('-', '_') | translate }}</span>
+                </div>
+                <div class="price-box">
+                  <span class="price-val">₹{{ transport.priceIndicative }}</span>
+                  <span class="price-basis">{{ transport.pricingBasis }}</span>
+                </div>
+              </div>
+
+              <div class="specs-grid">
+                <div class="spec-item">
+                  <span class="spec-label">{{ 'TRANSPORT_RESULTS.CAPACITY' | translate }}:</span>
+                  <strong>{{ transport.loadCapacity }}</strong>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">{{ 'TRANSPORT_RESULTS.DISTANCE' | translate }}:</span>
+                  <strong>{{ transport.distanceFromPickup }} km</strong>
+                </div>
+                <div class="spec-item provider-spec">
+                  <span class="spec-label">{{ 'TRANSPORT_RESULTS.PROVIDER' | translate }}:</span>
+                  <strong>{{ transport.providerName }}</strong>
+                </div>
+              </div>
+
+              <div class="card-rating-row">
+                <app-rating [value]="transport.rating" [count]="transport.reviewCount" />
+              </div>
+
+              <p class="transport-desc">{{ transport.description }}</p>
+
+              <div class="card-actions">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="onViewDetails(transport)"
+                >
+                  {{ 'TRANSPORT_RESULTS.VIEW_DETAILS' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-primary"
+                  (click)="onRequestTransport(transport)"
+                >
+                  {{ 'TRANSPORT_RESULTS.REQUEST_TRANSPORT' | translate }} &rarr;
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>
+

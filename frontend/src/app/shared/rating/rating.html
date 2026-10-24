@@ -1,0 +1,8 @@
+<span class="rating">
+  <span class="rating__star" aria-hidden="true">★</span>
+  <span class="rating__value">{{ displayRating() }}</span>
+  @if (displayCount() > 0) {
+    <span class="rating__count">({{ displayCount() }})</span>
+  }
+</span>
+

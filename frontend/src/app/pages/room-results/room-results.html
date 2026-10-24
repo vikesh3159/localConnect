@@ -1,0 +1,154 @@
+<section class="room-results-page">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/">{{ 'NAV.HOME' | translate }}</a>
+    <span class="separator">›</span>
+    <a routerLink="/room-search">{{ 'ROOM_SEARCH.TITLE' | translate }}</a>
+    <span class="separator">›</span>
+    <span class="current">{{ 'ROOM_RESULTS.TITLE' | translate }}</span>
+  </nav>
+
+  <!-- Search Summary -->
+  @if (hasSearch()) {
+    <div class="search-summary">
+      <div class="summary-content">
+        <div class="summary-items">
+          <div class="summary-item">
+            <span class="summary-icon">📍</span>
+            <span class="summary-text">{{ search().location }}</span>
+          </div>
+          @if (search().checkIn && search().checkOut) {
+            <div class="summary-item">
+              <span class="summary-icon">📅</span>
+              <span class="summary-text">{{ search().checkIn }} → {{ search().checkOut }}</span>
+            </div>
+          }
+          <div class="summary-item">
+            <span class="summary-icon">👥</span>
+            <span class="summary-text">{{ search().guests }} {{ 'ROOM_RESULTS.GUESTS' | translate }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-icon">🚪</span>
+            <span class="summary-text">{{ search().rooms }} {{ 'ROOM_RESULTS.ROOMS' | translate }}</span>
+          </div>
+          @if (roomTypeLabel()) {
+            <div class="summary-item">
+              <span class="summary-icon">🏠</span>
+              <span class="summary-text">{{ roomTypeLabel() | translate }}</span>
+            </div>
+          }
+        </div>
+        <button class="edit-btn" (click)="onEditSearch()">
+          <span>✏️</span> {{ 'ROOM_RESULTS.EDIT_SEARCH' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Page Title -->
+  <div class="results-header">
+    <h1>{{ 'ROOM_RESULTS.TITLE' | translate }}</h1>
+    @if (!loading() && results().length > 0) {
+      <p class="results-count">{{ results().length }} {{ 'ROOM_RESULTS.FOUND' | translate }}</p>
+    }
+  </div>
+
+  <!-- Loading Skeletons -->
+  @if (loading()) {
+    <div class="results-grid">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line narrow"></div>
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-actions">
+              <div class="skeleton-btn"></div>
+              <div class="skeleton-btn"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && results().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🏠</div>
+      <h2>{{ 'ROOM_RESULTS.NO_RESULTS' | translate }}</h2>
+      <p>{{ 'ROOM_RESULTS.NO_RESULTS_DESC' | translate }}</p>
+      <button class="btn-primary" (click)="onEditSearch()">{{ 'ROOM_RESULTS.MODIFY_SEARCH' | translate }}</button>
+    </div>
+  }
+
+  <!-- Results -->
+  @if (!loading() && results().length > 0) {
+    <div class="results-grid">
+      @for (room of results(); track room.id) {
+        <article class="result-card">
+          <!-- Image Area -->
+          <div class="card-image">
+            <span class="card-emoji">{{ room.imageEmoji }}</span>
+            @if (room.demoAvailable) {
+              <div class="demo-badge-wrap">
+                <app-demo-badge />
+              </div>
+            }
+          </div>
+
+          <!-- Card Body -->
+          <div class="card-body">
+            <div class="card-header-row">
+              <h3 class="property-name">{{ room.propertyName }}</h3>
+              <span class="room-type-badge">{{ 'ROOM_TYPE.' + room.type | translate }}</span>
+            </div>
+
+            <div class="card-location">
+              <span class="loc-icon">📍</span> {{ room.location }}
+            </div>
+
+            <div class="card-price">
+              <span class="price-amount">{{ formatPrice(room.pricePerNight) }}</span>
+              <span class="price-unit">/ {{ 'ROOM_RESULTS.NIGHT' | translate }}</span>
+            </div>
+
+            <div class="card-capacity">
+              <span>👥</span> {{ 'ROOM_RESULTS.UP_TO' | translate }} {{ room.guestCapacity }} {{ 'ROOM_RESULTS.GUESTS' | translate }}
+            </div>
+
+            <!-- Amenities -->
+            @if (room.amenities.length > 0) {
+              <div class="amenities">
+                @for (amenity of room.amenities; track amenity) {
+                  <span class="amenity-pill">{{ amenity }}</span>
+                }
+              </div>
+            }
+
+            <div class="card-provider">
+              <span class="provider-label">{{ 'ROOM_RESULTS.PROVIDER' | translate }}:</span>
+              <span class="provider-name">{{ room.providerName }}</span>
+            </div>
+
+            <div class="card-rating">
+              <app-rating [rating]="room.rating" [reviewCount]="room.reviewCount" />
+            </div>
+
+            <!-- Actions -->
+            <div class="card-actions">
+              <button class="btn-secondary" (click)="onViewDetails(room)">
+                {{ 'ROOM_RESULTS.VIEW_DETAILS' | translate }}
+              </button>
+              <button class="btn-primary" (click)="onRequestBooking(room)">
+                {{ 'ROOM_RESULTS.REQUEST_BOOKING' | translate }}
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

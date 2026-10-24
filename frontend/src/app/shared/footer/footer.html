@@ -1,0 +1,30 @@
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo" aria-hidden="true"></span>
+      <span class="footer-name">{{ 'APP.NAME' | translate }}</span>
+      <p class="footer-tagline">{{ 'FOOTER.TAGLINE' | translate }}</p>
+    </div>
+
+    <div class="footer-links">
+      <h4>{{ 'FOOTER.CATEGORIES' | translate }}</h4>
+      <a routerLink="/vehicle-search">{{ 'HOME.CATEGORIES.VEHICLE.TITLE' | translate }}</a>
+      <a routerLink="/room-search">{{ 'HOME.CATEGORIES.ROOM.TITLE' | translate }}</a>
+      <a routerLink="/transport-search">{{ 'HOME.CATEGORIES.TRANSPORT.TITLE' | translate }}</a>
+      <a routerLink="/emergency">{{ 'HOME.CATEGORIES.EMERGENCY.TITLE' | translate }}</a>
+    </div>
+
+    <div class="footer-links">
+      <h4>{{ 'FOOTER.QUICK_LINKS' | translate }}</h4>
+      <a routerLink="/my-requests">{{ 'NAV.MY_REQUESTS' | translate }}</a>
+      <a routerLink="/provider-dashboard">{{ 'NAV.PROVIDER_DASHBOARD' | translate }}</a>
+      <a routerLink="/login">{{ 'NAV.LOGIN' | translate }}</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-demo">{{ 'FOOTER.DEMO_NOTICE' | translate }}</p>
+    <p class="footer-copy">&copy; 2024 LocalConnect. {{ 'FOOTER.COPYRIGHT' | translate }}</p>
+  </div>
+</footer>
+

@@ -1,0 +1,203 @@
+<div class="details-page">
+  <div class="details-container">
+    <!-- Back button -->
+    <button class="back-btn" (click)="goBack()">
+      <span class="back-icon">←</span>
+      {{ 'DETAILS.BACK_TO_RESULTS' | translate }}
+    </button>
+
+    @if (resource(); as res) {
+      <!-- Hero area -->
+      <div class="hero" [class]="'hero--' + category()">
+        <div class="hero__emoji">{{ categoryEmoji() }}</div>
+        <div class="hero__content">
+          <span class="hero__category">{{ categoryLabel() | translate }}</span>
+          <h1 class="hero__title">
+            @if (vehicleResource; as v) {
+              {{ v.name }}
+            } @else if (roomResource; as r) {
+              {{ r.propertyName }}
+            } @else if (transportResource; as t) {
+              {{ t.vehicleName }}
+            }
+          </h1>
+          <div class="hero__meta">
+            @if (vehicleResource; as v) {
+              <app-rating [rating]="v.providerRating" [reviewCount]="v.reviewCount" />
+            } @else if (roomResource; as r) {
+              <app-rating [rating]="r.rating" [reviewCount]="r.reviewCount" />
+            } @else if (transportResource; as t) {
+              <app-rating [rating]="t.rating" [reviewCount]="t.reviewCount" />
+            }
+            <app-demo-badge />
+          </div>
+        </div>
+      </div>
+
+      <!-- Resource details -->
+      <div class="details-grid">
+        <div class="details-main">
+          <!-- Vehicle details -->
+          @if (vehicleResource; as v) {
+            <div class="info-card">
+              <h2 class="info-card__title">{{ 'DETAILS.VEHICLE_INFO' | translate }}</h2>
+              <div class="info-rows">
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.TYPE' | translate }}</span>
+                  <span class="info-row__value">{{ v.type }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.SEATING_CAPACITY' | translate }}</span>
+                  <span class="info-row__value"
+                    >{{ v.seatingCapacity }} {{ 'DETAILS.SEATS' | translate }}</span
+                  >
+                </div>
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.DISTANCE' | translate }}</span>
+                  <span class="info-row__value">{{ v.distanceFromPickup }} km</span>
+                </div>
+              </div>
+              <div class="badge-row">
+                <span class="badge badge--info">🧑‍✈️ {{ 'DETAILS.WITH_DRIVER' | translate }}</span>
+              </div>
+              <div class="price-block">
+                <span class="price-label">{{ 'DETAILS.PRICE_PER_TRIP' | translate }}</span>
+                <span class="price-value">₹{{ v.pricePerTrip }}</span>
+              </div>
+            </div>
+
+            @if (v.features && v.features.length > 0) {
+              <div class="info-card">
+                <h2 class="info-card__title">{{ 'DETAILS.FEATURES' | translate }}</h2>
+                <div class="features-list">
+                  @for (feature of v.features; track feature) {
+                    <span class="feature-tag">✓ {{ feature }}</span>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="info-card">
+              <h2 class="info-card__title">{{ 'DETAILS.DESCRIPTION' | translate }}</h2>
+              <p class="description-text">{{ v.description }}</p>
+            </div>
+          }
+
+          <!-- Room details -->
+          @if (roomResource; as r) {
+            <div class="info-card">
+              <h2 class="info-card__title">{{ 'DETAILS.ROOM_INFO' | translate }}</h2>
+              <div class="info-rows">
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.ROOM_TYPE' | translate }}</span>
+                  <span class="info-row__value">{{ r.type }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.LOCATION' | translate }}</span>
+                  <span class="info-row__value">{{ r.propertyName }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.GUEST_CAPACITY' | translate }}</span>
+                  <span class="info-row__value"
+                    >{{ r.guestCapacity }} {{ 'DETAILS.GUESTS' | translate }}</span
+                  >
+                </div>
+              </div>
+              <div class="price-block">
+                <span class="price-label">{{ 'DETAILS.PRICE_PER_NIGHT' | translate }}</span>
+                <span class="price-value">₹{{ r.pricePerNight }}</span>
+              </div>
+            </div>
+
+            @if (r.amenities && r.amenities.length > 0) {
+              <div class="info-card">
+                <h2 class="info-card__title">{{ 'DETAILS.AMENITIES' | translate }}</h2>
+                <div class="features-list">
+                  @for (amenity of r.amenities; track amenity) {
+                    <span class="feature-tag">{{ amenity }}</span>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="info-card">
+              <h2 class="info-card__title">{{ 'DETAILS.DESCRIPTION' | translate }}</h2>
+              <p class="description-text">{{ r.description }}</p>
+            </div>
+          }
+
+          <!-- Transport details -->
+          @if (transportResource; as t) {
+            <div class="info-card">
+              <h2 class="info-card__title">{{ 'DETAILS.TRANSPORT_INFO' | translate }}</h2>
+              <div class="info-rows">
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.VEHICLE_TYPE' | translate }}</span>
+                  <span class="info-row__value">{{ t.type }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.LOAD_CAPACITY' | translate }}</span>
+                  <span class="info-row__value">{{ t.loadCapacity }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'DETAILS.DISTANCE' | translate }}</span>
+                  <span class="info-row__value">{{ t.distanceFromPickup }} km</span>
+                </div>
+              </div>
+              <div class="price-block">
+                <span class="price-label">{{ 'DETAILS.INDICATIVE_PRICE' | translate }}</span>
+                <span class="price-value">₹{{ t.priceIndicative }}</span>
+                <span class="price-basis">{{ t.pricingBasis }}</span>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <h2 class="info-card__title">{{ 'DETAILS.DESCRIPTION' | translate }}</h2>
+              <p class="description-text">{{ t.description }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Provider sidebar -->
+        <div class="details-sidebar">
+          @if (provider(); as prov) {
+            <div class="provider-card">
+              <h2 class="provider-card__title">{{ 'DETAILS.PROVIDER' | translate }}</h2>
+              <div class="provider-card__name">{{ prov.name }}</div>
+              <div class="provider-card__area">📍 {{ prov.area }}</div>
+              @if (prov.verified) {
+                <span class="badge badge--success">✓ {{ 'DETAILS.VERIFIED' | translate }}</span>
+              }
+              <p class="provider-card__desc">{{ prov.description }}</p>
+              <div class="provider-card__stats">
+                <div class="stat">
+                  <span class="stat__label">{{ 'DETAILS.JOINED' | translate }}</span>
+                  <span class="stat__value">{{ prov.joinedYear }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat__label">{{ 'DETAILS.RESPONSE_RATE' | translate }}</span>
+                  <span class="stat__value">{{ prov.responseRate }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat__label">{{ 'DETAILS.RATING' | translate }}</span>
+                  <span class="stat__value">{{ prov.rating }} ⭐</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <button class="request-btn" (click)="requestResource()">
+            {{ 'DETAILS.REQUEST_RESOURCE' | translate }}
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="not-found">
+        <p>{{ 'DETAILS.NOT_FOUND' | translate }}</p>
+        <button class="btn-secondary" (click)="goBack()">
+          {{ 'DETAILS.BACK_TO_RESULTS' | translate }}
+        </button>
+      </div>
+    }
+  </div>
+</div>

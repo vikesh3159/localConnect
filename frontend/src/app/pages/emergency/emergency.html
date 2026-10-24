@@ -1,0 +1,287 @@
+<div class="emergency-page">
+  <!-- Top Statutory Helplines Banner & Direct Dialers -->
+  <section class="statutory-section" aria-labelledby="statutory-heading">
+    <div class="statutory-header">
+      <div class="badge-urgent">
+        <span>🚨 OFFICIAL GOVERNMENT HELPLINES (PRIORITY 1)</span>
+      </div>
+      <h1 id="statutory-heading" class="statutory-title">
+        {{ 'EMERGENCY.HELPLINES_TITLE' | translate }}
+      </h1>
+      <p class="statutory-subtitle">
+        {{ 'EMERGENCY.HELPLINES_SUBTITLE' | translate }}
+      </p>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <div class="category-pills" role="tablist">
+      <button
+        type="button"
+        class="cat-pill"
+        [class.active]="selectedCategory() === 'all'"
+        (click)="selectedCategory.set('all')"
+      >All Services</button>
+      <button
+        type="button"
+        class="cat-pill"
+        [class.active]="selectedCategory() === 'medical'"
+        (click)="selectedCategory.set('medical')"
+      >🏥 Medical (108 / 102)</button>
+      <button
+        type="button"
+        class="cat-pill"
+        [class.active]="selectedCategory() === 'police'"
+        (click)="selectedCategory.set('police')"
+      >👮 Police (100 / 112)</button>
+      <button
+        type="button"
+        class="cat-pill"
+        [class.active]="selectedCategory() === 'highway'"
+        (click)="selectedCategory.set('highway')"
+      >🛣️ Highway Patrol (1073)</button>
+      <button
+        type="button"
+        class="cat-pill"
+        [class.active]="selectedCategory() === 'fire'"
+        (click)="selectedCategory.set('fire')"
+      >🚒 Fire (101)</button>
+      <button
+        type="button"
+        class="cat-pill"
+        [class.active]="selectedCategory() === 'women'"
+        (click)="selectedCategory.set('women')"
+      >🛡️ Women (1091)</button>
+    </div>
+
+    <!-- Statutory Cards Grid -->
+    <div class="helpline-grid">
+      @for (h of filteredHelplines(); track h.number) {
+        <div class="helpline-card" [class]="'cat-' + h.category">
+          <div class="helpline-number-wrap">
+            <span class="helpline-number">{{ h.number }}</span>
+            <span class="helpline-badge">{{ h.category | uppercase }}</span>
+          </div>
+
+          <div class="helpline-details">
+            <strong class="helpline-service">{{ h.serviceKey | translate }}</strong>
+            <p class="helpline-desc">{{ h.descriptionKey | translate }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="btn-dial"
+            (click)="onDialHelpline(h)"
+            [attr.aria-label]="'Call ' + h.number"
+          >
+            <span class="dial-icon" aria-hidden="true">📞</span>
+            <span>{{ 'EMERGENCY.CALL_NOW' | translate }} ({{ h.number }})</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (lastDialedHelpline()) {
+      <div class="dial-feedback">
+        <span>✅ Direct call initiated for helpline <strong>{{ lastDialedHelpline() }}</strong>. Call record registered.</span>
+      </div>
+    }
+  </section>
+
+  <!-- Legal & Operational Disclaimer -->
+  <div class="disclaimer-callout">
+    <span class="callout-icon" aria-hidden="true">⚠️</span>
+    <div class="callout-text">
+      <strong>Statutory Disclaimer & Dispatch Notice:</strong>
+      <p>{{ 'EMERGENCY.DISCLAIMER' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Active Alert Tracking Card (Truthful State Engine) -->
+  @if (activeAlert()) {
+    <section class="active-tracker-card" aria-labelledby="tracker-heading">
+      <div class="tracker-header">
+        <div>
+          <span class="tracker-badge">LIVE ASSISTANCE STATUS</span>
+          <h2 id="tracker-heading">Request Ref: {{ activeAlert()?.id }}</h2>
+        </div>
+        <button type="button" class="btn-text-danger" (click)="clearAlert()">Dismiss / New Request</button>
+      </div>
+
+      <div class="truthful-notice">
+        <span>🛡️ {{ 'EMERGENCY.TRUTHFUL_DISPATCH_NOTICE' | translate }}</span>
+      </div>
+
+      <!-- State Stepper -->
+      <div class="status-stepper">
+        <div class="step" [class.completed]="true">
+          <div class="step-dot">✓</div>
+          <div class="step-info">
+            <strong>{{ 'EMERGENCY.STATUS_REQUESTED' | translate }}</strong>
+            <small>Broadcast sent to nearby providers</small>
+          </div>
+        </div>
+
+        <div class="step" [class.completed]="activeAlert()?.status === 'provider-acknowledged' || activeAlert()?.status === 'confirmed-en-route' || activeAlert()?.status === 'resolved'">
+          <div class="step-dot">
+            @if (activeAlert()?.status === 'provider-acknowledged' || activeAlert()?.status === 'confirmed-en-route' || activeAlert()?.status === 'resolved') { ✓ } @else { 2 }
+          </div>
+          <div class="step-info">
+            <strong>{{ 'EMERGENCY.STATUS_ACKNOWLEDGED' | translate }}</strong>
+            <small>Local provider verifying vehicle/driver</small>
+          </div>
+        </div>
+
+        <div class="step" [class.completed]="activeAlert()?.status === 'confirmed-en-route' || activeAlert()?.status === 'resolved'">
+          <div class="step-dot">
+            @if (activeAlert()?.status === 'confirmed-en-route' || activeAlert()?.status === 'resolved') { ✓ } @else { 3 }
+          </div>
+          <div class="step-info">
+            <strong>{{ 'EMERGENCY.STATUS_EN_ROUTE' | translate }}</strong>
+            @if (activeAlert()?.status === 'confirmed-en-route' || activeAlert()?.status === 'resolved') {
+              <small class="en-route-details">
+                ETA: <strong>{{ activeAlert()?.providerEtaMinutes || 12 }} mins</strong> | Vehicle: <strong>{{ activeAlert()?.providerVehiclePlate || 'MP-12-CD-5678' }}</strong>
+              </small>
+            } @else {
+              <small>Awaiting confirmed provider departure</small>
+            }
+          </div>
+        </div>
+
+        <div class="step" [class.completed]="activeAlert()?.status === 'resolved'">
+          <div class="step-dot">
+            @if (activeAlert()?.status === 'resolved') { ✓ } @else { 4 }
+          </div>
+          <div class="step-info">
+            <strong>{{ 'EMERGENCY.STATUS_RESOLVED' | translate }}</strong>
+            <small>On-scene assistance completed</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo Simulation Trigger Bar -->
+      <div class="demo-sim-bar">
+        <span class="sim-label">⚡ Demo Status Testing:</span>
+        <button type="button" class="btn-sim" (click)="simulateProviderAck()">Simulate Provider Ack</button>
+        <button type="button" class="btn-sim" (click)="simulateProviderEnRoute()">Simulate En Route (12m ETA)</button>
+        <button type="button" class="btn-sim" (click)="simulateResolve()">Simulate Resolved</button>
+      </div>
+
+      <div class="alert-meta-box">
+        <div class="meta-row">
+          <span>Type:</span>
+          <strong>{{ activeAlert()?.emergencyType }}</strong>
+        </div>
+        <div class="meta-row">
+          <span>Location:</span>
+          <strong>{{ activeAlert()?.callerLocation }} ({{ activeAlert()?.callerLandmark || 'No landmark' }})</strong>
+        </div>
+        <div class="meta-row">
+          <span>Contact:</span>
+          <strong>{{ activeAlert()?.contactPhone }}</strong>
+        </div>
+        @if (activeAlert()?.notes) {
+          <div class="meta-row">
+            <span>Notes:</span>
+            <span>{{ activeAlert()?.notes }}</span>
+          </div>
+        }
+      </div>
+    </section>
+  } @else {
+    <!-- Secondary Community Broadcast Form -->
+    <section class="community-broadcast-section" aria-labelledby="community-heading">
+      <div class="community-header">
+        <h2 id="community-heading">
+          {{ 'EMERGENCY.COMMUNITY_ALERT_TITLE' | translate }}
+        </h2>
+        <p class="community-subtitle">
+          {{ 'EMERGENCY.COMMUNITY_ALERT_SUBTITLE' | translate }}
+        </p>
+      </div>
+
+      @if (formError()) {
+        <div class="alert-error" role="alert">
+          <span>⚠️ {{ formError() }}</span>
+        </div>
+      }
+
+      <form class="community-form" (submit)="$event.preventDefault(); broadcastCommunityAlert()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="c-type">{{ 'EMERGENCY.ASSISTANCE_TYPE' | translate }} *</label>
+            <select
+              id="c-type"
+              [ngModel]="alertType()"
+              (ngModelChange)="alertType.set($event)"
+              name="type"
+            >
+              @for (option of typeOptions; track option.value) {
+                <option [value]="option.value">{{ option.labelKey | translate }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="c-phone">Your Contact Mobile Number *</label>
+            <input
+              id="c-phone"
+              type="tel"
+              required
+              [ngModel]="callerPhone()"
+              (ngModelChange)="callerPhone.set($event)"
+              name="phone"
+              placeholder="e.g. 9876543210"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="c-loc">{{ 'EMERGENCY.LOCATION' | translate }} *</label>
+            <input
+              id="c-loc"
+              type="text"
+              required
+              [ngModel]="callerLocation()"
+              (ngModelChange)="callerLocation.set($event)"
+              name="loc"
+              [attr.placeholder]="'EMERGENCY.LOCATION_PLACEHOLDER' | translate"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="c-landmark">Nearby Landmark / Highway Milestone</label>
+            <input
+              id="c-landmark"
+              type="text"
+              [ngModel]="callerLandmark()"
+              (ngModelChange)="callerLandmark.set($event)"
+              name="landmark"
+              placeholder="e.g. Near HP Petrol Pump, NH-347"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="c-notes">{{ 'EMERGENCY.DESCRIPTION' | translate }}</label>
+          <textarea
+            id="c-notes"
+            rows="3"
+            [ngModel]="callerNotes()"
+            (ngModelChange)="callerNotes.set($event)"
+            name="notes"
+            [attr.placeholder]="'EMERGENCY.DESCRIPTION_PLACEHOLDER' | translate"
+          ></textarea>
+        </div>
+
+        <button type="submit" class="btn-broadcast" [disabled]="isBroadcasting()">
+          @if (isBroadcasting()) {
+            <span>Broadcasting Alert...</span>
+          } @else {
+            <span>🚨 Broadcast Urgent Alert to Nearby Providers</span>
+          }
+        </button>
+      </form>
+    </section>
+  }
+</div>

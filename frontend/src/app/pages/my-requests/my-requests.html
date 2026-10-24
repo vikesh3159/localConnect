@@ -1,0 +1,291 @@
+<div class="my-requests-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ 'MY_REQUESTS.TITLE' | translate }}</h1>
+      <p class="page-subtitle">Track your broadcasts, evaluate provider quotes, and confirm bookings with ₹0 advance.</p>
+    </div>
+    <a routerLink="/" class="btn-new-request">➕ New Resource Request</a>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button
+      class="filter-pill"
+      [class.filter-pill--active]="activeTab() === 'all'"
+      (click)="activeTab.set('all')"
+    >
+      {{ 'MY_REQUESTS.FILTER_ALL' | translate }} ({{ requests().length }})
+    </button>
+    <button
+      class="filter-pill"
+      [class.filter-pill--active]="activeTab() === 'active'"
+      (click)="activeTab.set('active')"
+    >
+      ⚡ Active Broadcasts
+    </button>
+    <button
+      class="filter-pill"
+      [class.filter-pill--active]="activeTab() === 'confirmed'"
+      (click)="activeTab.set('confirmed')"
+    >
+      ✅ Confirmed Bookings
+    </button>
+    <button
+      class="filter-pill"
+      [class.filter-pill--active]="activeTab() === 'expired'"
+      (click)="activeTab.set('expired')"
+    >
+      ⚠️ Expired Requests
+    </button>
+  </div>
+
+  @if (filteredRequests().length === 0) {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <span class="empty-state__icon">📋</span>
+      <h2 class="empty-state__title">{{ 'MY_REQUESTS.EMPTY' | translate }}</h2>
+      <p class="empty-state__text">{{ 'MY_REQUESTS.EMPTY_DESCRIPTION' | translate }}</p>
+      <a routerLink="/" class="btn-primary">{{ 'MY_REQUESTS.EXPLORE' | translate }}</a>
+    </div>
+  } @else {
+    <!-- Request Cards Grid -->
+    <div class="request-list">
+      @for (request of filteredRequests(); track request.id) {
+        <article class="request-card" [class]="'request-card--' + request.category">
+          <div class="request-card__top">
+            <div class="request-card__category">
+              <span class="request-card__category-icon">{{ getCategoryIcon(request.category) }}</span>
+              <div>
+                <span class="request-card__category-name">{{ 'CATEGORY.' + request.category.toUpperCase() | translate }}</span>
+                <span class="request-card__ref-number">{{ request.referenceNumber }}</span>
+              </div>
+            </div>
+            <app-status-badge [status]="request.status" />
+          </div>
+
+          <!-- Broadcast Window & Overnight TTL Badge -->
+          @if (request.broadcastExpiresAt && request.status !== 'completed' && request.status !== 'fully-allocated' && request.status !== 'cancelled') {
+            <div class="ttl-banner" [class.expired]="request.isExpired || request.status === 'expired'">
+              @if (request.isExpired || request.status === 'expired') {
+                <span class="ttl-icon">⌛</span>
+                <span class="ttl-text">Broadcast Window Expired</span>
+              } @else {
+                <span class="ttl-icon">🕒</span>
+                <span class="ttl-text">
+                  Response Window: <strong>{{ broadcastPolicy.getRemainingTimeString(request.broadcastExpiresAt).text }}</strong> remaining
+                </span>
+              }
+            </div>
+          }
+
+          <!-- Summary Grid -->
+          <div class="request-card__summary">
+            @for (entry of getSummaryEntries(request.summary); track entry.key) {
+              <div class="request-card__summary-row">
+                <span class="request-card__summary-key">{{ entry.key }}:</span>
+                <span class="request-card__summary-val">{{ entry.value }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Quotations & Two-Stage Nomination Section -->
+          @if (request.offers && request.offers.length > 0) {
+            <div class="quotes-section">
+              <div class="quotes-header">
+                <strong>📥 Received Provider Quotations ({{ request.offers.length }})</strong>
+                <span class="privacy-tag">🔒 Driver Contact Withheld until Confirmation</span>
+              </div>
+
+              <div class="quotes-list">
+                @for (offer of request.offers; track offer.id) {
+                  <div class="quote-card" [class.held]="offer.status === 'provisionally-selected'" [class.confirmed]="offer.status === 'nomination-confirmed'">
+                    <div class="quote-card-header">
+                      <div>
+                        <strong class="provider-biz-name">{{ offer.providerBusinessName }}</strong>
+                        <span class="provider-stars">★ {{ offer.providerRating }}</span>
+                      </div>
+                      <div class="quote-price-tag">
+                        <span class="price-val">₹{{ offer.quotedAmount }}</span>
+                        <span class="price-basis">All-Inclusive</span>
+                      </div>
+                    </div>
+
+                    <div class="quote-meta-badges">
+                      <span class="badge-qty">Vehicles: {{ offer.offeredQuantity }}</span>
+                      @if (offer.includesDriver) {
+                        <span class="badge-driver">✓ Certified Driver Included</span>
+                      }
+                    </div>
+
+                    <!-- Stage 1 Action: Select & Hold -->
+                    @if (offer.status === 'submitted') {
+                      <div class="quote-action-bar">
+                        <button
+                          type="button"
+                          class="btn-select-hold"
+                          (click)="selectOffer(request.id, offer)"
+                        >
+                          Select & Request 15-Min Hold &rarr;
+                        </button>
+                      </div>
+                    }
+
+                    <!-- Stage 2: 15-Minute Hold & Nomination State -->
+                    @if (offer.status === 'provisionally-selected') {
+                      <div class="hold-active-box">
+                        <div class="hold-timer-row">
+                          <span class="timer-badge">⏳ 15-Minute Hold Active</span>
+                          <span class="timer-desc">Provider must assign a verified vehicle & certified driver.</span>
+                        </div>
+
+                        <!-- Nomination verification preview -->
+                        @if (offer.nominatedVehiclePlate) {
+                          <div class="nomination-details verified">
+                            <span class="verified-icon">🛡️</span>
+                            <div>
+                              <strong>Vehicle Nominated: {{ offer.nominatedResourceTitle }} ({{ offer.nominatedVehiclePlate }})</strong>
+                              <p>Commercial Driver License: <strong>VERIFIED BY ADMIN</strong></p>
+                            </div>
+                          </div>
+
+                          <!-- Stage 3 Confirmation (₹0 Advance) -->
+                          <div class="confirm-cta-box">
+                            <div class="zero-advance-banner">
+                              <strong>₹0 Advance Required:</strong>
+                              <span>Pay ₹{{ offer.quotedAmount }} directly to the provider via Cash or UPI only after service is completed.</span>
+                            </div>
+                            <button
+                              type="button"
+                              class="btn-confirm-final"
+                              (click)="confirmBooking(request.id, offer)"
+                            >
+                              ✅ Confirm Booking (₹0 Advance)
+                            </button>
+                          </div>
+                        } @else {
+                          <div class="nomination-details pending">
+                            <span class="pending-icon">⏳</span>
+                            <div>
+                              <strong>Awaiting Provider Assignment...</strong>
+                              <p>Provider is selecting an available vehicle from their approved fleet.</p>
+                            </div>
+                            <button
+                              type="button"
+                              class="btn-sim-nominate"
+                              (click)="simulateProviderNomination(request.id, offer.id)"
+                            >
+                              ⚡ Test: Provider Nominates Vehicle
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    <!-- Stage 3 Confirmed: Disclose Driver Contact Details -->
+                    @if (offer.status === 'nomination-confirmed' || request.status === 'fully-allocated') {
+                      <div class="confirmed-booking-box">
+                        <div class="confirmed-header">
+                          <span class="check-icon">✓</span>
+                          <div>
+                            <strong>Booking Confirmed! Details Unlocked:</strong>
+                            <span>Pay ₹{{ offer.quotedAmount }} directly upon completion.</span>
+                          </div>
+                        </div>
+
+                        <div class="driver-card-unlocked">
+                          <div class="driver-info-item">
+                            <span class="k">Assigned Driver:</span>
+                            <strong class="v">{{ offer.assignedDriverName || 'Suresh Sharma' }}</strong>
+                          </div>
+                          <div class="driver-info-item">
+                            <span class="k">Direct Contact:</span>
+                            <strong class="v phone-link">
+                              <a [href]="'tel:' + (offer.assignedDriverPhone || '+919826012345')">
+                                📞 {{ offer.assignedDriverPhone || '+91 98260 12345' }}
+                              </a>
+                            </strong>
+                          </div>
+                          <div class="driver-info-item">
+                            <span class="k">Vehicle Plate:</span>
+                            <strong class="v">{{ offer.nominatedVehiclePlate || 'MP-12-CD-5678' }}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- 4-Action Remediation for Expired Request -->
+          @if (request.isExpired || request.status === 'expired') {
+            <div class="expired-remedy-card">
+              <div class="remedy-header">
+                <span class="warn-icon">⚠️</span>
+                <div>
+                  <strong>Broadcast Window Expired</strong>
+                  <p>No provider accepted before the window closed. Choose an action to find available resources:</p>
+                </div>
+              </div>
+
+              <div class="remedy-buttons">
+                <button
+                  type="button"
+                  class="btn-remedy extend"
+                  (click)="applyRemedy('EXTEND_WINDOW')"
+                >
+                  ⏱️ Extend Window (+2h)
+                </button>
+                <button
+                  type="button"
+                  class="btn-remedy expand"
+                  (click)="applyRemedy('EXPAND_RADIUS')"
+                >
+                  📍 Expand Search (+10km)
+                </button>
+                <button
+                  type="button"
+                  class="btn-remedy edit"
+                  (click)="openRemedyModal(request.id)"
+                >
+                  ✏️ Modify Details
+                </button>
+                <button
+                  type="button"
+                  class="btn-remedy cancel"
+                  (click)="applyRemedy('CANCEL_REQUEST')"
+                >
+                  ✕ Cancel Request
+                </button>
+              </div>
+            </div>
+          }
+
+          <div class="request-card__footer">
+            <span class="request-card__date">Submitted: {{ request.createdAt }}</span>
+            @if (canCancel(request.status)) {
+              <button class="btn-cancel" (click)="cancelRequest(request.id)">
+                {{ 'MY_REQUESTS.CANCEL' | translate }}
+              </button>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- Remediation Edit Modal -->
+  @if (selectedRemedyRequestId()) {
+    <div class="modal-backdrop" (click)="closeRemedyModal()">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <h3>Modify Request Details</h3>
+        <p>Adjust your pickup date or requirements to invite new provider quotations.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeRemedyModal()">Cancel</button>
+          <button type="button" class="btn-primary" (click)="applyRemedy('EXTEND_WINDOW')">Save & Re-Broadcast</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
